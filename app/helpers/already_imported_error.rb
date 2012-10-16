@@ -1,0 +1,5 @@
+class AlreadyImportedError < Exception
+  
+  
+  
+end

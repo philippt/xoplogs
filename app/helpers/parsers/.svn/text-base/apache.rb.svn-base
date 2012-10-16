@@ -1,0 +1,6 @@
+require 'helpers/parsers/xop_apache'
+
+class Apache < XopApache
+
+  
+end

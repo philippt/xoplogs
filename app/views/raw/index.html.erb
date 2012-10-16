@@ -1,0 +1,50 @@
+<h3>raw data slabs for '<%= params[:host_name] %>'</h3>
+
+<div class="dataTables_wrapper">
+<table class="display" id="slab_table">
+  <thead>
+    <tr>
+    	<th>service</th>
+		<th>the_day</th>
+		<th>needs aggregation</th>
+		<th>assigned aggregator</th>
+		<th>last aggregated at</th>
+		<th>archived?</th>
+	</tr>
+  </thead>
+  <tbody>
+	  <% @slabs.each do |slab| 
+	  %>
+	  <tr>
+	  	<td><%= slab.service_name %></td>
+		<td>
+					
+		  <% if not slab.is_archived %>
+		  <a href="raw/slab?table_name=<%= slab.table_name %>">
+		  <% end %>
+		  
+		     <%= slab.the_day %>
+			 
+		  <% if not slab.is_archived %>
+		  </a>
+		  <% end %>
+		  
+		</td>
+		<td><%= slab.needs_aggregation %></td>
+		<td><%= slab.active_aggregator_pid %></td>
+		<td><%= slab.last_aggregated_at %></td>
+		<td><%= slab.is_archived %></td>		
+	  </tr>
+	  <% end %>
+  </tbody>
+	
+</table>
+</div>
+
+<script type="text/javascript">
+	
+	jQuery(function($) {
+		$('#slab_table').dataTable();
+	})
+
+</script>	

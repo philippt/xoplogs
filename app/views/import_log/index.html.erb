@@ -1,0 +1,52 @@
+<h1>ImportLog#index</h1>
+<p>Find me in app/views/import_log/index.html.erb</p>
+
+<div class="dataTables_wrapper">
+<table class="display" id="file_table">
+  <thead>
+    <tr>
+    	<th>service</th>
+		<th>file_name</th>
+		<th>import start</th>
+		<th>import stop</th>
+		<th>time range</th>
+		<th>errors</th>
+		<th>ignored</th>
+		<th>imported</th>
+		<th>progress</th>
+		<th>processing</th>
+		<th>import</th>
+	</tr>
+  </thead>
+  <tbody>
+	  <% @files.each do |file| %>
+	  <tr>
+	  	<td><%= file.service_name %></td>
+		<td><%= file.file_name %></td>
+		<td><%= file.created_at %></td>
+		<td><%= file.updated_at %></td>
+		<td><%= file.first_ts %>-<%= file.last_ts %></td>
+		<td><%= file.lines_unparseable %></td>
+		<td><%= file.lines_ignored_old %></td>
+		<td><%= file.lines_read %></td>
+		<td><%= file.lines_processed %> / <%= file.lines_total %></td>
+		<td><%= file.processing_duration %> secs</td>
+		<td><%= file.import_duration %> secs</td>
+	  </tr>
+	  <% end %>
+  </tbody>
+	
+</table>
+</div>
+
+<script type="text/javascript">
+	
+	jQuery(function($) {
+		$('#file_table').dataTable(
+			{
+				"aaSorting": [[2, "desc"]]
+			}
+		);
+	})
+
+</script>	
