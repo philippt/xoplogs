@@ -1,0 +1,7 @@
+ruby-devel
+rubygem-rake
+make
+gcc
+gcc-c++
+mysql-devel
+ruby-mysql
