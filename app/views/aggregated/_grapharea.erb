@@ -1,0 +1,27 @@
+<div id="grapharea">
+<%
+graph_width = 400
+if params.has_key?(:graph_width) && params[:graph_width] != ""
+  graph_width = params[:graph_width].to_i
+end
+graph_height = graph_width.to_i / 2
+%>
+	<ul id="graphs">
+	  <li class="graphcontainer">
+	    <div id="graph_request_count" class="graph" style="width:<%= graph_width %>px;height:<%= graph_height %>px"></div>
+	    <p class="graph_subtitle">request count (per minute)</p>
+	  </li>
+	  <li class="graphcontainer">
+	    <div id="graph_response_time" class="graph" style="width:<%= graph_width %>px;height:<%= graph_height %>px"></div>
+	    <p class="graph_subtitle">response time (in ms)</p>
+	  </li>
+	</ul>
+</div>
+
+<%
+rawNaviTopMargin = graph_height + 30;
+%>
+<div id="rawDataNavi" style="margin-top: <%= rawNaviTopMargin %>px;">
+
+
+</div>

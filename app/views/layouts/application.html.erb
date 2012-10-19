@@ -8,7 +8,71 @@
 </head>
 <body>
 
+<a href="/"><h1 title="deine mudder">xoplogs</h1></a>
+<div id="menu">
+	<h3><a href="#">Aggregated</a></h3>
+	<ul>
+  	  <li><a href="/aggregated?">(all hosts)</a></li>
+  	  <% @host_list.sort.each do |host_name| %>
+	    <li>
+	      <a href="/aggregated?hosts[]=<%= host_name %>">
+	        <%= host_name %>
+	      </a>
+	    </li>
+	  <% end %>
+  	</ul>
+  	
+	<h3><a href="#">Raw Data</a></h3>
+    <ul>
+	  <% @raw_data_host_list.each do |host_name| %>
+		<li>
+			<a href="/raw?host_name=<%= host_name %>">
+				<%= host_name %>
+			</a>
+		</li>
+	  <% end %>
+	</ul>
+  	
+  	<h3><a href="#">Import Log</a></h3>  
+    <ul>
+	  <li><a href="/import_log?">(all hosts)</a></li>
+	  <% @imported_host_list.sort.each do |host_name| %>
+	  <li>
+	  	<a href="/import_log?host_name=<%= host_name %>">	  	
+	  	  <%= host_name %>
+		</a>
+	  </li>
+	  <% end %>
+	</ul>  
+</div>	
+
+<div id="content">
+
 <%= yield %>
+
+</div>
+
+<script type="text/javascript">
+
+<%
+  accordion_index = {
+	"AggregatedController" => 0,
+    "RawController" => 1,
+	"ImportLogController" => 2
+  }
+  selection = 0
+  if accordion_index.has_key?(controller.class.to_s)
+    selection = accordion_index[controller.class.to_s] 
+  end
+%>
+
+jQuery(function() {
+	$('#menu').accordion({header: 'h3'});
+	console.log("activating <%= selection %>");
+    $('#menu').accordion("activate", <%= selection %>);	
+});
+
+</script>
 
 </body>
 </html>

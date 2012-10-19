@@ -1,0 +1,9 @@
+ruby
+ruby-devel
+rubygems
+rubygem-rake
+ruby-mysql
+gcc
+gcc-c++
+make
+#mysqlclient-devel # fails with multiple dependency resolution options

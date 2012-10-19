@@ -1,0 +1,8 @@
+<div id="import_test">
+<% idx = 0 %>
+<% @batch.each do |line| %>
+  <% classes = [ (@parsed[idx] ? 'ok' : 'fail') ] %>
+  <p><span class="<%= classes.join %>"><%= idx %></span>&nbsp;&nbsp;<%= line %></p>
+  <% idx += 1 %>
+<% end %>
+</div>

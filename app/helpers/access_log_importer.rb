@@ -8,6 +8,12 @@ class AccessLogImporter
     @host_name = host_name
     @service_name = service_name
     @file_type = file_type
+    
+    @known_parsers = {
+      "apache" => Apache,
+      "xop_apache" => XopApache,
+      "nginx" => Nginx
+    }
   end
   
   def write_stats()
@@ -73,6 +79,14 @@ class AccessLogImporter
     end
   end
   
+  def parser
+    if @known_parsers.has_key?(@file_type)
+      parser = @known_parsers[@file_type].new(@host_name, @service_name)
+    else
+      raise "unknown file type #{@file_type}"
+    end
+  end
+  
   def process_file(file_name)
     $logger.debug "reading from file #{file_name} for #{@service_name}@#{@host_name}"
     
@@ -106,22 +120,7 @@ class AccessLogImporter
     @imported_file.save()   
 
     # parse the file and convert into tab-separated values
-    # TODO refactor
-    if @file_type == "apache"
-      parser = Apache.new(@host_name, @service_name)
-    elsif @file_type == "xop_apache"
-      parser = XopApache.new(@host_name, @service_name)
-    elsif @file_type == "nginx"
-      parser = Nginx.new(@host_name, @service_name)
-    end
-    
-    #parser = XopApache.new(@host_name, @service_name)
-    #parser = Apache.new(@host_name, @service_name)
-    
-    
-    
     @file_name = file_name
-    #tsv_file_name = file_name + '.tsv'
     
     @unparseable_count = 0
     @read_count = 0

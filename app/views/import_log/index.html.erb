@@ -1,10 +1,8 @@
-<h1>ImportLog#index</h1>
-<p>Find me in app/views/import_log/index.html.erb</p>
-
 <div class="dataTables_wrapper">
 <table class="display" id="file_table">
   <thead>
     <tr>
+    	<th>host</th>
     	<th>service</th>
 		<th>file_name</th>
 		<th>import start</th>
@@ -20,7 +18,8 @@
   </thead>
   <tbody>
 	  <% @files.each do |file| %>
-	  <tr>
+	  <tr id="<%= file.id %>">
+	  	<td><%= file.host_name %></td>
 	  	<td><%= file.service_name %></td>
 		<td><%= file.file_name %></td>
 		<td><%= file.created_at %></td>

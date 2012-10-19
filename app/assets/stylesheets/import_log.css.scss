@@ -1,3 +1,11 @@
 // Place all the styles related to the import_log controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+#import_test p span.ok {
+  color: green;
+}
+
+#import_test p span.fail {
+  color: red;
+}

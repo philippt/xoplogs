@@ -11,3 +11,15 @@
  *= require_self
  *= require_tree .
  */
+
+#menu {
+	padding: 20px;
+	width: 30%;
+	height: 100%;
+	float: left;
+}
+
+#content {
+	float: left;
+	
+}

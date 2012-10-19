@@ -148,9 +148,8 @@ EOF
       "select " + HttpAccessEntryTable.grouped_data_columns + " " +
       "from access_by_service_per_hours " +
       "where " + standard_condition
-    sanitized = HttpAccessEntryTable.sanitize_sql(statement)
-    #$logger.debug(sanitized)
-    
+      
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
     AccessByServicePerHour.find_by_sql(sanitized)
   end
   
@@ -160,7 +159,8 @@ EOF
       "from access_by_service_per_mins " +
       "where " + standard_condition + " " +
       "group by year(log_ts), month(log_ts), day(log_ts), hour(log_ts)"
-    sanitized = HttpAccessEntryTable.sanitize_sql(statement)
+      
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
     result = {}
     HttpAccessEntry.find_by_sql(sanitized).each do |row|
       timestamp = Time.parse("#{row.the_year}-#{row.the_month}-#{row.the_day} #{row.the_hour}:00")
@@ -177,7 +177,10 @@ EOF
       "GROUP BY year(log_ts), month(log_ts), day(log_ts), hour(log_ts), minute(log_ts) " +
       "ORDER BY log_ts"
     ]
-    sanitized = HttpAccessEntryTable.sanitize_sql(conditions)
+    
+    statement = conditions.first
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
+    
     result = {}
     HttpAccessEntry.find_by_sql(sanitized).each do |row|
       timestamp = Time.parse("#{row.the_year}-#{row.the_month}-#{row.the_day} #{row.the_hour}:#{row.the_minute}")
@@ -186,10 +189,6 @@ EOF
     result
   end
   
-  #def HttpAccessEntryTable.sanitize_sql(conditions)
-  #  ActiveRecord::Base.sanitize_sql_array(conditions)
-  #end
-    
   def HttpAccessEntryTable.find_table_for_aggregator    
     the_pid = Process.pid
     ActiveRecord::Base.connection.execute(
@@ -238,8 +237,7 @@ EOF
     "FROM access_by_service_per_mins " +
     "where host_name = '#{host_name}' and log_ts >= '#{starting_from_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' and log_ts < '#{stop_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' " +
     "group by year(log_ts), month(log_ts), day(log_ts), hour(log_ts), minute(log_ts)"
-    sanitized = HttpAccessEntryTable.sanitize_sql(statement)
-    #$logger.debug(sanitized)
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
     result = {}
     HttpAccessEntry.find_by_sql(sanitized).each do |row|
       timestamp = Time.parse("#{row.the_year}-#{row.the_month}-#{row.the_day} #{row.the_hour}:#{row.the_minute}")
@@ -255,8 +253,7 @@ EOF
     "FROM access_by_service_per_mins " +
     "where host_name = '#{host_name}' and log_ts >= '#{starting_from_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' and log_ts < '#{stop_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' " +
     "group by year(log_ts), month(log_ts), day(log_ts), hour(log_ts)"
-    sanitized = HttpAccessEntryTable.sanitize_sql(statement)
-    #$logger.debug(sanitized)
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
     result = {}
     HttpAccessEntry.find_by_sql(sanitized).each do |row|
       timestamp = Time.parse("#{row.the_year}-#{row.the_month}-#{row.the_day} #{row.the_hour}:00")
@@ -272,9 +269,7 @@ EOF
       "select " + grouped_data_columns + " " +
       "from access_by_service_per_hours " +
       "where host_name = '#{host_name}' and log_ts >= '#{starting_from_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' and log_ts < '#{stop_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' "
-    sanitized = HttpAccessEntryTable.sanitize_sql(statement)
-    #$logger.debug(sanitized)
-    
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
     AccessByHostPerHour.find_by_sql(sanitized)
   end
   
@@ -285,8 +280,7 @@ EOF
     "FROM access_by_host_per_mins " +
     "where log_ts >= '#{starting_from_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' and log_ts < '#{stop_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' " +
     "group by year(log_ts), month(log_ts), day(log_ts), hour(log_ts), minute(log_ts)"
-    sanitized = HttpAccessEntryTable.sanitize_sql(statement)
-    #$logger.debug(sanitized)
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
     result = {}
     HttpAccessEntry.find_by_sql(sanitized).each do |row|
       timestamp = Time.parse("#{row.the_year}-#{row.the_month}-#{row.the_day} #{row.the_hour}:#{row.the_minute}")
@@ -302,8 +296,7 @@ EOF
     "FROM access_by_host_per_hours " +
     "where log_ts >= '#{starting_from_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' and log_ts < '#{stop_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' " +
     "group by year(log_ts), month(log_ts), day(log_ts), hour(log_ts)"
-    sanitized = HttpAccessEntryTable.sanitize_sql(statement)
-    #$logger.debug(sanitized)
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
     result = {}
     HttpAccessEntry.find_by_sql(sanitized).each do |row|
       timestamp = Time.parse("#{row.the_year}-#{row.the_month}-#{row.the_day} #{row.the_hour}:00")
@@ -319,9 +312,7 @@ EOF
       "select " + grouped_data_columns + " " +
       "from access_by_host_per_hours " +
       "where log_ts >= '#{starting_from_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' and log_ts < '#{stop_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' "
-    sanitized = HttpAccessEntryTable.sanitize_sql(statement)
-    #$logger.debug(sanitized)
-    
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
     AccessByHostPerHour.find_by_sql(sanitized)
   end
   
@@ -329,7 +320,7 @@ EOF
     the_border = Time.now().to_i - (24 * 60 * 60) * DAYS_TO_KEEP
     date_string = Time.at(the_border).strftime("%Y%m%d")
     statement = "SELECT * FROM http_access_entry_tables WHERE the_day < '#{date_string}' AND is_archived = 0"
-    sanitized = HttpAccessEntryTable.sanitize_sql(statement)
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
     HttpAccessEntryTable.find_by_sql(sanitized)
   end
   

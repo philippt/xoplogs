@@ -20,4 +20,16 @@ class ImportLogController < ApplicationController
     end
   end
   
+  def test
+    file = ImportedFile.find(params[:id])
+    @batch = `head -n100 #{file.file_name}`
+    parser = AccessLogImporter.new('no.such.host', 'dummy', params[:parser]).parser
+    idx = 0
+    @parsed = {}
+    @batch.split("\n").each do |line|
+      @parsed[idx] = parser.parse(line)
+      idx += 1
+    end 
+  end
+  
 end

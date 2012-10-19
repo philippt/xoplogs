@@ -1,4 +1,6 @@
 class AccessByHostPerDay < ActiveRecord::Base
+  
+  attr_accessible :log_ts, :host_name, :service_name, :success_count, :failure_count, :response_time_micros_avg
 
    def self.find_distinct(start_ts, stop_ts, column_name)
     conditions = ["select distinct #{column_name} from #{self.table_name} where log_ts >= from_unixtime(?) and log_ts <= from_unixtime(?) order by #{column_name}"]

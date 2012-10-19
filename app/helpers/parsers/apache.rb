@@ -2,15 +2,16 @@
 
 class Apache < XopApache
 
-    # apache combined format  
-    # 10.60.10.3 - - [13/Oct/2012:23:44:44 +0200] "GET /logging/today HTTP/1.1" 304 - "http://dev.virtualop.org/logging/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:16.0) Gecko/20100101 Firefox/16.0"
-    # 10.60.10.3 - - [13/Oct/2012:23:57:27 +0200] "GET /css/tabs.css HTTP/1.1" 304 - "http://website.dev.virtualop.org/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.5; rv:16.0) Gecko/20100101 Firefox/16.0"
 
   def parse(line)
     entry = nil
 
-    result = /([\d\.]+)\s+-\s+-\s+\[([^\]]+)\]\s+"(\w+)\s+(\S+?)(?:\?(.+))?\s+(.+)"\s+(\d+)\s+-\s+\"([^"]+)\"\s+\"([^"]+)\"/.match(line)
-    #result = /([\d\.]+)\s+-\s+-\s+\[([^\]]+)\]\s+\"([^"]+)\"\s+(\d+)\s+-\s+\"([^"]+)\"\s+\"([^"]+)\"\s+\"([^"]+)\"/.match(line)    
+    # apache combined format  
+    # 10.60.10.3 - - [13/Oct/2012:23:44:44 +0200] "GET /logging/today HTTP/1.1" 304 - "http://dev.virtualop.org/logging/" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:16.0) Gecko/20100101 Firefox/16.0"
+    # 10.60.10.3 - - [13/Oct/2012:23:57:27 +0200] "GET /css/tabs.css HTTP/1.1" 304 - "http://website.dev.virtualop.org/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.5; rv:16.0) Gecko/20100101 Firefox/16.0"
+    
+            # 10.60.10.3  -   -    [13/Oct/2012:23:57:27 +0200] "GET /css/tabs.css HTTP/1.1" 304 - "http://website.dev.virtualop.org/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.5; rv:16.0) Gecko/20100101 Firefox/16.0"
+    result = /([\d\.]+)\s+-\s+-\s+\[([^\]]+)\]\s+"(\w+)\s+(\S+?)(?:\?(.+))?\s+(.+)"\s+(\d+)\s+([-\d]+)\s+\"([^"]+)\"\s+\"([^"]+)\"/.match(line)
     if result then
       entry = {
         :log_ts => DateTime.strptime(result.captures[1], "%d/%b/%Y:%H:%M:%S %z"),
@@ -25,8 +26,10 @@ class Apache < XopApache
         :query_string => result.captures[4],
         :http_version => result.captures[5],
         
-        :referrer => result.captures[7],
-        :user_agent => result.captures[8]
+        :response_size_bytes => result.captures[7],
+        
+        :referrer => result.captures[8],
+        :user_agent => result.captures[9]
       
       }
     end

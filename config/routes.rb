@@ -1,7 +1,19 @@
 Xoplogs::Application.routes.draw do
+  
+  match "aggregated" => 'aggregated#index'
+  get "aggregated/index"
+  get "aggregated/graph_request_count_success"
+  get "aggregated/graph_request_count_errors"
+  get "aggregated/graph_request_count_total"
+  get "aggregated/graph_response_time"
+  get "aggregated/get_data"
+
   get "raw/index"
+  match "raw" => 'raw#index'
 
   get "import_log/index"
+  get "import_log/test"
+  match "import_log" => 'import_log#index'
 
   get "test/index"
 
