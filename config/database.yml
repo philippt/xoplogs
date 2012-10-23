@@ -15,7 +15,7 @@ development:
   database: xoplogs_development
   pool: 5
   username: root
-  password: the_password 
+  #password: the_password 
   #socket: /var/run/mysqld/mysqld.sock
   # aggregated:
     # adapter: mysql2
@@ -46,7 +46,7 @@ test:
   database: xoplogs_test
   pool: 5
   username: root
-  password: the_password
+  #password: the_password
   #socket: /var/run/mysqld/mysqld.sock
 
 production:
@@ -56,5 +56,5 @@ production:
   database: xoplogs_production
   pool: 5
   username: root
-  password: the_password
+  #password: the_password
   #socket: /var/run/mysqld/mysqld.sock

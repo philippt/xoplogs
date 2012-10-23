@@ -3,7 +3,7 @@ unless file_name and file_type and host_name and service_name
   # TODO refactor ParserBase to use new parsers in helpers/parsers
   #known_parsers = ParserBase.known_parsers.join('|')
   known_parsers = %w|apache xop_apache nginx|
-  puts "Usage: #{__FILE__} /path/to/log/file <#{known_parsers}.join('|')> <host_name> <service_name>"
+  puts "Usage: #{__FILE__} /path/to/log/file <#{known_parsers.join('|')}> <host_name> <service_name>"
   Kernel.exit(1)
 end
 

@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS %s (
   updated_at datetime default NULL,
   query_string varchar(1024) default NULL,
   aggregated_flag int(11) default NULL,
-  PRIMARY KEY  (id),
+  PRIMARY KEY  (id),  
   KEY index_http_access_entries_on_log_ts (log_ts),
   KEY index_http_access_entries_on_host_name (host_name),
   KEY index_http_access_entries_on_service_name (service_name),

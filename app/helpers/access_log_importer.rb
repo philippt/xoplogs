@@ -14,6 +14,8 @@ class AccessLogImporter
       "xop_apache" => XopApache,
       "nginx" => Nginx
     }
+    
+    @model_class = HttpAccessEntryTable
   end
   
   def write_stats()
