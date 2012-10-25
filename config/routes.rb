@@ -9,6 +9,7 @@ Xoplogs::Application.routes.draw do
   get "aggregated/get_data"
 
   get "raw/index"
+  get "raw/slab"
   match "raw" => 'raw#index'
 
   get "import_log/index"

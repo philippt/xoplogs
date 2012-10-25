@@ -12,6 +12,7 @@ class JbossServerLog
     # 2012-10-22 00:00:30,375 DEBUG [com.arjuna.ats.arjuna.logging.arjLogger] (Thread-12) StatusModule: first pass
     # 2012-10-22 00:00:30,375 DEBUG [com.arjuna.ats.txoj.logging.txojLoggerI18N] (Thread-12) [com.arjuna.ats.internal.txoj.recovery.TORecoveryModule_3] - TORecoveryModule - first pass
     
+              #0              1         2               3           4
     pattern = /([\d\s:,-]+)\s+(\w+)\s+\[([\w\.]+)\]\s+\(([^)]+)\)\s+(.+)/
     #pattern = /([\d-:,.]+)\s+(\w+)\s+\[([\w\.]+)\]\s+\(([^)]+)\)\s+(.+)/
     
@@ -24,7 +25,7 @@ class JbossServerLog
         :service_name => @service_name,
         :log_level => result.captures[1],
         :class_name => result.captures[2],
-        :message => result.captures[4],
+        :message => result.captures[4].strip.chomp,
         :stacktrace => '' 
       }
     else

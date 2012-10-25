@@ -75,7 +75,7 @@ class ApplicationController < ActionController::Base
   def prepare_hostlist
     @host_list = AccessByHostPerDay.find_distinct(@start_ts, @stop_ts, 'host_name')
     @imported_host_list = ImportedFile.find_distinct('host_name')
-    @raw_data_host_list = HttpAccessEntryTable.find_all_hosts    
+    @raw_data_host_list = HttpAccessEntryTable.find_all_hosts + ServerLogTable.find_all_hosts   
   end  
   
 end

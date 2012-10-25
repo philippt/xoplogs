@@ -30,6 +30,12 @@ EOF
     'sl_' + self.host_name.gsub(/[\.-]/, "_") + '_' + self.service_name + '_' + self.the_day
   end
   
+  def self.raw_data(table_name)
+    statement = "select * from #{table_name} limit 100"
+    sanitized = ActiveRecord::Base.sanitize_sql_array([statement])
+    self.find_by_sql(sanitized)
+  end
+  
   def self.import_column_list
     %w|log_ts host_name service_name| +
     %w|log_level class_name message stacktrace|
@@ -73,7 +79,7 @@ EOF
     self.create_table()
     
     ActiveRecord::Base.connection.execute(
-      #"LOAD DATA LOCAL INFILE '#{file_name}' INTO TABLE #{table_name} " +
+      # TODO "LOAD DATA LOCAL INFILE '#{file_name}' INTO TABLE #{table_name} " +
       "LOAD DATA INFILE '#{file_name}' INTO TABLE #{table_name} " +
       "(#{ServerLogTable.import_columns});"
     )
