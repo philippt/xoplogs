@@ -22,8 +22,11 @@ class ImportLogController < ApplicationController
   
   def test
     file = ImportedFile.find(params[:id])
-    @batch = `head -n100 #{file.file_name}`
+    @batch = `head -n5000 #{file.file_name}`
+    
+    #TODO parser = ServerLogImporter.new('no.such.host', 'dummy', params[:parser]).parser
     parser = AccessLogImporter.new('no.such.host', 'dummy', params[:parser]).parser
+    
     idx = 0
     @parsed = {}
     @batch.split("\n").each do |line|

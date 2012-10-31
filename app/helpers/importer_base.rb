@@ -15,8 +15,8 @@ class ImporterBase
       raise "unknown file type #{@file_type}"
     end
   end
-    
-  def process_file(file_name)
+  
+  def prepare_import(file_name)
     $logger.debug "reading from file #{file_name} for #{@service_name}@#{@host_name}"
     
     # check by md5sum if this file has been imported already
@@ -57,11 +57,18 @@ class ImporterBase
     
     @parsed_entries = {}
     
+    last_imported_position
+  end
+    
+  def process_file(file_name)
+    last_imported_position = prepare_import(file_name)
+    
     first_entry = nil
     last_entry = nil      
     
     puts "importing #{file_name} - interesting columns for parser #{parser.class.to_s} are #{@model_class.import_columns}"
     
+    idx = 0
     File.open(file_name, "r") do |infile|
       while (line = infile.gets)
         if @read_count % 50000 == 0
@@ -70,6 +77,7 @@ class ImporterBase
         
         parsing_start = Time.now()
         entry = parser.parse(line)
+        puts "#{idx} #{entry}"
         parsing_stop = Time.now()
         @imported_file.processing_duration += parsing_stop.to_i - parsing_start.to_i
 
@@ -88,48 +96,36 @@ class ImporterBase
             next              
           end
           
-          # keep track of which records we imported
-          first_entry = entry if first_entry == nil
-          last_entry = entry
-          
-          # and write tab-separatedly into the outfile
-          #the_values = entry.values 
-          # [   
-            # entry[:log_ts].strftime("%Y-%m-%d %H:%M:%S"),              
-            # @host_name, 
-            # @service_name, 
-            # entry[:method_name],
-            # entry[:remote_ip],
-            # entry[:x_forwarded_for],
-            # entry[:source_ip],
-            # entry[:http_host_name],
-            # entry[:http_method],
-            # entry[:http_version],
-            # entry[:return_code],
-            # entry[:response_size_bytes],
-            # entry[:response_time_microsecs],
-            # entry[:user_agent],
-            # entry[:referrer],
-            # entry[:md5_checksum],
-            # entry[:query_string]
-          # ]
-          
-          the_values = []
-          @model_class.import_column_list.each do |column|
-            the_values << entry[column.to_sym]
-          end
-          
-          the_values[0] = entry[:log_ts].strftime("%Y-%m-%d %H:%M:%S")
           the_day = entry[:log_ts].strftime("%Y%m%d")
           
-          @parsed_entries[the_day] = [] unless @parsed_entries.has_key?(the_day)
-          @parsed_entries[the_day] << the_values
+          if entry.class.to_s == "Hash"
+            # and write tab-separatedly into the outfile
+            puts "got entry hash from line #{idx}"
+            the_values = []
+            @model_class.import_column_list.each do |column|
+              the_values << entry[column.to_sym]
+            end
+            
+            the_values[0] = entry[:log_ts].strftime("%Y-%m-%d %H:%M:%S")
+            
+            @parsed_entries[the_day] = [] unless @parsed_entries.has_key?(the_day)
+            @parsed_entries[the_day] << the_values
+            
+            # keep track of which records we imported
+            first_entry = entry if first_entry == nil
+            last_entry = entry
+          else
+            puts "adding stacktrace from line #{idx}"
+            @parsed_entries[the_day].last[:stacktrace] += "\n#{entry}"
+          end
           
           @read_count += 1
         else
           $logger.debug "[UNPARSEABLE] #{line}"
           @unparseable_count += 1
-        end          
+        end
+        
+        idx += 1          
       end
     end
 
@@ -145,7 +141,6 @@ class ImporterBase
   
   def import_parsed_entries
     @parsed_entries.each do |the_day, entries|
-      #tsv_file_name = @file_name + '_' + the_day.strftime("%Y%m%d") + '.tsv'
       tsv_file_name = @file_name + '_' + the_day + '.tsv'
       import_file the_day, tsv_file_name
     end

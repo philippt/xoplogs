@@ -11,25 +11,25 @@ class Apache < XopApache
     # 10.60.10.3 - - [13/Oct/2012:23:57:27 +0200] "GET /css/tabs.css HTTP/1.1" 304 - "http://website.dev.virtualop.org/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.5; rv:16.0) Gecko/20100101 Firefox/16.0"
     # 10.60.10.3  -   -    [13/Oct/2012:23:57:27 +0200] "GET /css/tabs.css HTTP/1.1" 304 - "http://website.dev.virtualop.org/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.5; rv:16.0) Gecko/20100101 Firefox/16.0"
     
-    result = /([\d\.]+)\s+-\s+-\s+\[([^\]]+)\]\s+"(\w+)\s+(\S+?)(?:\?(.+))?\s+(.+)"\s+(\d+)\s+([-\d]+)\s+\"([^"]+)\"\s+\"([^"]+)\"/.match(line)
+    result = /([\d\.]+)\s+-\s+(\S+)\s+\[([^\]]+)\]\s+"(\w+)\s+(\S+?)(?:\?(.+))?\s+(.+)"\s+(\d+)\s+([-\d]+)\s+\"([^"]+)\"\s+\"([^"]+)\"/.match(line)
     if result then
       entry = {
-        :log_ts => DateTime.strptime(result.captures[1], "%d/%b/%Y:%H:%M:%S %z"),
-        #:http_host_name => result.captures[1],
+        :log_ts => DateTime.strptime(result.captures[2], "%d/%b/%Y:%H:%M:%S %z"),
+        :basic_user => result.captures[1],
       
         :remote_ip => result.captures[0],
   
-        :return_code => result.captures[6],
+        :return_code => result.captures[7],
         
-        :http_method => result.captures[2],        
-        :method_name => result.captures[3],
-        :query_string => result.captures[4],
-        :http_version => result.captures[5],
+        :http_method => result.captures[3],        
+        :method_name => result.captures[4],
+        :query_string => result.captures[5],
+        :http_version => result.captures[6],
         
-        :response_size_bytes => result.captures[7],
+        :response_size_bytes => result.captures[8],
         
-        :referrer => result.captures[8],
-        :user_agent => result.captures[9]
+        :referrer => result.captures[9],
+        :user_agent => result.captures[10]
       
       }
     end

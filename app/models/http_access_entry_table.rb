@@ -38,7 +38,9 @@ CREATE TABLE IF NOT EXISTS %s (
 EOF
 
   def table_name
-    'hae_' + self.host_name.gsub(".", "_") + '_' + self.service_name + '_' + self.the_day
+    # TODO [refactor] move to base
+    'hae_' + self.host_name.gsub(/[\.-]/, "_") + '_' + self.service_name + '_' + self.the_day
+    #'sl_' + self.host_name.gsub(/[\.-]/, "_") + '_' + self.service_name + '_' + self.the_day
   end
   
   def start_ts
@@ -375,7 +377,7 @@ EOF
     self.create_table()
     
     ActiveRecord::Base.connection.execute(
-      "LOAD DATA LOCAL INFILE '#{file_name}' INTO TABLE #{table_name} " +
+      "LOAD DATA INFILE '#{file_name}' INTO TABLE #{table_name} " +
       "(log_ts, host_name, service_name, method_name, remote_ip, x_forwarded_for, source_ip, http_host_name, http_method, http_version, return_code, response_size_bytes, response_time_microsecs, user_agent, referrer, md5_checksum, query_string);"
     )
     
