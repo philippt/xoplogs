@@ -14,6 +14,8 @@ Xoplogs::Application.routes.draw do
 
   get "import_log/index"
   get "import_log/test"
+  get "import_log/upload"
+  match "import_log/upload_file"
   match "import_log" => 'import_log#index'
 
   get "test/index"

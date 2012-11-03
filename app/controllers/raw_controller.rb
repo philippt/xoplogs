@@ -23,7 +23,8 @@ class RawController < ApplicationController
   def slab
     prefix = /([^_]+)_/.match(params[:table_name]).captures.first
     #@records =
-    @raw = ServerLogTable.raw_data(params[:table_name])   
+    @raw = HttpAccessEntryTable.raw_data(params[:table_name])
+    # TODO @raw = ServerLogTable.raw_data(params[:table_name])   
   end
   
 end

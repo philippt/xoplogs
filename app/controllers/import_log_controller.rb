@@ -34,5 +34,13 @@ class ImportLogController < ApplicationController
       idx += 1
     end 
   end
+
+  def upload
+    
+  end
+  
+  def upload_file
+    
+  end
   
 end

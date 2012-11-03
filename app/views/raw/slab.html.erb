@@ -1,3 +1,4 @@
 <% @raw.each do |row| %>
+<pre><%#= row.log_ts %> <%#= row.log_level %>  <%#= row.class_name %> <%#= row.message %></pre>
 <pre><%= row.log_ts %> <%= row.log_level %>  <%= row.class_name %> <%= row.message %></pre>
 <% end %>
