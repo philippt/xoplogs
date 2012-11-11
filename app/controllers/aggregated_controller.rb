@@ -3,6 +3,8 @@ class AggregatedController < ApplicationController
   def index
     @total_count = 0
     @entries = []
+    
+    with_aggregated_data { |x| x }
   end
   
   # the following methods are called from javascript in order to fetch data for
@@ -194,11 +196,10 @@ class AggregatedController < ApplicationController
       end
     end
 
-    # now that we aggregated everything, we can normalize the display to requests per second
     aggregated_bucket_size = the_model[:bucket_size_secs] * aggregation_factor
     result.each do |bucket|
       record = bucket[1]
-      # let's normalize the counts to requests per minute
+      # normalize the counts to requests per minute
       record.success_count /= (aggregated_bucket_size / 60)
       record.failure_count /= (aggregated_bucket_size / 60)
     end
@@ -263,7 +264,9 @@ class AggregatedController < ApplicationController
     )
 
     buckets = prepare_buckets(records, timeframe[:bucket_size_secs])
-    result = aggregate_buckets(buckets, timeframe)
+    #result = aggregate_buckets(buckets, timeframe)
+    @buckets = buckets
+    result = buckets
 
     # finally, let's extract from the buckets the data that's interesting for this graph
     result.each do |bucket|

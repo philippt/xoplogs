@@ -1,7 +1,12 @@
 <h2>upload logs here</h2>
 
+host name: <input type="text" id="host_name" />
+service name: <input type="text" id="service_name" />
+<br/>
+parser: <input type="text" id="parser" />
+
 <div id="dropbox">
-  <span class="message">Drop images here to upload. <br /><i>(they will only be visible to you)</i></span>
+  <span class="message">Drop logs here to upload. <br /><i>(if you dare)</i></span>
 </div>
 
 <script>
@@ -18,6 +23,12 @@ $(function(){
 		maxfiles: 5,
     	maxfilesize: 2, // in mb
 		url: '/import_log/upload_file',
+		
+		data: {
+			host_name: function() { return $('#host_name').val(); },
+			service_name: function() { return $('#service_name').val(); },
+			parser: function() { return $('#parser').val(); }
+		},
 
 		uploadFinished:function(i,file,response){
 			$.data(file).addClass('done');

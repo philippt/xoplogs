@@ -40,6 +40,16 @@ class ImportLogController < ApplicationController
   end
   
   def upload_file
+    file_name = params[:pic].tempfile.to_path.to_s
+    
+    host_name, service_name, file_type = params[:host_name], params[:service_name], params[:parser]
+        
+    begin
+      importer = AccessLogImporter.new(host_name, service_name, file_type)
+      importer.process_file(file_name)
+    rescue AlreadyImportedError => e
+      $logger.warn("duplicate file : #{e.message}")
+    end
     
   end
   
