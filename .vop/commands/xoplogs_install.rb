@@ -19,4 +19,7 @@ on_machine do |machine, params|
   ].each do |command|
     machine.ssh_and_check_result("command" => "cd #{params["service_root"]} && #{command}")
   end
+  
+  machine.install_service_from_working_copy("working_copy" => "xoplogs", "service" => "aggregator")
+  machine.install_service_from_working_copy("working_copy" => "xoplogs", "service" => "total_aggregator")
 end

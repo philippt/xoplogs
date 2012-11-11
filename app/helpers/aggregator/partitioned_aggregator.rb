@@ -15,7 +15,7 @@ class PartitionedAggregator
         $logger.info "table #{target_table.table_name} seems to have been aggregated completely."
         target_table.needs_aggregation = false
         target_table.active_aggregator_pid = nil
-        target_table.last_aggregated_at = Time.now()
+        target_table.last_aggregated_at = Time.now().utc
         #target_table.last_aggregated_at = Time.now().strftime("%Y-%m-%d %H:%M:%S")
         target_table.save
       else
