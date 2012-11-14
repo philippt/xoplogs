@@ -1,6 +1,7 @@
 <h2>aggregated access logs <%= ": #{params[:hosts]}" %></h2>
 
-<!--table>
+<% if params[:debug] %>
+<table>
 	<thead>
 		<tr>
 			<th>timestamp</th>
@@ -20,7 +21,8 @@
 		  </tr>
 		<% end %>
 	</tbody>>
-</table-->	
+</table>	
+<% end %>
 
 <%= render(:partial => "grapharea") %>
 

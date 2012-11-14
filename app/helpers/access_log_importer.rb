@@ -166,7 +166,7 @@ class AccessLogImporter
           
           # and write tab-separatedly into the outfile
           the_values = [   
-            entry[:log_ts].strftime("%Y-%m-%d %H:%M:%S"),              
+            entry[:log_ts].utc.strftime("%Y-%m-%d %H:%M:%S"),              
             @host_name, 
             @service_name, 
             entry[:method_name],
