@@ -22,4 +22,7 @@ on_machine do |machine, params|
   
   machine.install_service_from_working_copy("working_copy" => "xoplogs", "service" => "aggregator")
   machine.install_service_from_working_copy("working_copy" => "xoplogs", "service" => "total_aggregator")
+  
+  machine.mkdir("dir_name" => "/var/lib/mysql_import")
+  machine.chown("file_name" => "/var/lib/mysql_import", "ownership" => "mysql:")
 end
