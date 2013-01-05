@@ -392,7 +392,6 @@ EOF
       File.delete(tarball_name)
     end
     
-    # update is_archived flag
     self.is_archived = false
     self.save()
   end
