@@ -1,6 +1,7 @@
 require 'parsers/xop_apache'
 require 'parsers/apache'
 require 'parsers/nginx'
+require 'parsers/squid'
 
 class AccessLogImporter
   
@@ -12,7 +13,8 @@ class AccessLogImporter
     @known_parsers = {
       "apache" => Apache,
       "xop_apache" => XopApache,
-      "nginx" => Nginx
+      "nginx" => Nginx,
+      "squid" => Squid
     }
     
     @model_class = HttpAccessEntryTable

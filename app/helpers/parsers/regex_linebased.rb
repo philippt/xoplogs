@@ -3,6 +3,7 @@ class RegexLinebased
   def initialize(host_name, service_name)
     @host_name = host_name
     @service_name = service_name
+    @idx = 0
   end
   
   def regex
@@ -19,12 +20,25 @@ class RegexLinebased
   
   def parse(line)
     entry = nil
+    @idx += 1
 
     result = regex.match(line)
     if result then
       entry = {}
-      mapping.each do |key, idx|
-        entry[key] = result.captures[idx]
+      mapping.each do |key, idx|        
+        value = nil
+        if block_matched = /(.+)_block/.match(key.to_s)
+          begin
+            value = mapping[key].call(result.captures)
+            key = block_matched.captures.first.to_sym
+          rescue => error
+            $logger.warn("problem executing parse-block for #{key} on line #{@idx} : #{error.message}")
+          end
+        else
+          value = result.captures[idx]
+        end
+        
+        entry[key] = value
       end
     end
     

@@ -25,4 +25,33 @@ class PartitionedAggregator
     end
   end
   
+  def self.aggregate(entries)
+    success_entries = entries.select { |x| x[:return_code] < 400 }
+    failure_entries = entries.select { |x| x[:return_code] > 400 }
+    
+    by_minute = {}
+    0.upto(23) do |hour|
+      0.upto(59) do |minute|
+        
+        the_timestamp = Time.at(start_ts + (hour * 60 + minute) * 60)
+        
+        h = {
+          :log_ts => the_timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+          :success_count => 0, 
+          :failure_count => 0,
+          :response_time_micros_avg => 0
+        }
+        if success_entries.has_key?(the_timestamp)
+          h[:success_count] = success_entries[the_timestamp].the_count
+          h[:response_time_micros_avg] = success_entries[the_timestamp].the_avg
+        end
+        if failure_entries.has_key?(the_timestamp)
+          h[:failure_count] = failure_entries[the_timestamp].the_count
+        end
+        
+        by_minute[the_timestamp] = h
+      end
+    end
+  end
+  
 end

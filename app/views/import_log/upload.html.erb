@@ -21,8 +21,9 @@ $(function(){
 		paramname:'pic',
 
 		maxfiles: 5,
-    	maxfilesize: 2, // in mb
-		url: '/import_log/upload_file',
+    	maxfilesize: 20, // in mb
+		//url: '/import_log/upload_file',
+		url: '/import_log/parse',
 		
 		data: {
 			host_name: function() { return $('#host_name').val(); },

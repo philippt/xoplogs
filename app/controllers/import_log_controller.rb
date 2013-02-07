@@ -53,4 +53,31 @@ class ImportLogController < ApplicationController
     
   end
   
+  def parse_data
+    file_name = params[:pic].tempfile.to_path.to_s
+    parser = AccessLogImporter.new('no.such.host', 'dummy', params[:parser]).parser
+    
+    entries = []
+    File.open(file_name, "r") do |infile|
+      while (line = infile.gets)
+        parsing_start = Time.now()
+        entry = parser.parse(line)
+        parsing_stop = Time.now()
+        entries << entry
+      end
+    end
+    
+    entries
+  end
+  
+  def parse
+    render :json => parse_data
+  end
+  
+  def parse_and_aggregate
+    entries = parse_data
+   
+    
+  end
+  
 end
