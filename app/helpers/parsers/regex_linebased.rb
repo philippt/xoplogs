@@ -40,6 +40,10 @@ class RegexLinebased
         
         entry[key] = value
       end
+      #puts "parsed : "
+      #pp entry
+    else
+      puts "no match for line #{@idx}"
     end
     
     # postprocess what we got

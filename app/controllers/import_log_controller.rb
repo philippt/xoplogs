@@ -1,3 +1,5 @@
+#require 'pp'
+
 class ImportLogController < ApplicationController
   
   def index
@@ -76,8 +78,16 @@ class ImportLogController < ApplicationController
   
   def parse_and_aggregate
     entries = parse_data
-   
     
+    stats = PartitionedAggregator.aggregate(entries)
+    
+    stats.each do |selector, entries|
+      entries.each do |entry|
+        entry[0] = entry[0] * 1000
+      end
+    end
+    
+    render :json => stats.to_json()
   end
   
 end

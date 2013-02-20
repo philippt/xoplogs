@@ -26,32 +26,37 @@ class PartitionedAggregator
   end
   
   def self.aggregate(entries)
-    success_entries = entries.select { |x| x[:return_code] < 400 }
-    failure_entries = entries.select { |x| x[:return_code] > 400 }
     
-    by_minute = {}
-    0.upto(23) do |hour|
-      0.upto(59) do |minute|
-        
-        the_timestamp = Time.at(start_ts + (hour * 60 + minute) * 60)
-        
-        h = {
-          :log_ts => the_timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-          :success_count => 0, 
-          :failure_count => 0,
-          :response_time_micros_avg => 0
-        }
-        if success_entries.has_key?(the_timestamp)
-          h[:success_count] = success_entries[the_timestamp].the_count
-          h[:response_time_micros_avg] = success_entries[the_timestamp].the_avg
-        end
-        if failure_entries.has_key?(the_timestamp)
-          h[:failure_count] = failure_entries[the_timestamp].the_count
-        end
-        
-        by_minute[the_timestamp] = h
+    raw = {
+      :success => {},
+      :failure => {}
+    }
+    
+    entries.each do |entry|
+      if entry != nil
+        corrected_timestamp = entry[:log_ts].to_i - entry[:log_ts].min
+        selector = entry[:return_code].to_i < 400 ? :success : :failure
+        hash = raw[selector]
+        hash[corrected_timestamp] = [] unless hash.has_key? corrected_timestamp
+        hash[corrected_timestamp] << entry
+      else
+        $logger.warn("nil entry")
       end
     end
+
+    aggregated = {
+      :success => [],
+      :failure => []
+    }
+
+    raw.each do |selector, entries|
+      entries.keys.sort.each do |minute|
+        aggregated[selector] << [
+          minute, entries[minute].size          
+        ]
+      end
+    end
+    aggregated
   end
   
 end

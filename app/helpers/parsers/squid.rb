@@ -17,7 +17,7 @@ class Squid < RegexLinebased
       :cache_state => 4,
       :return_code => 5,
       :response_size_bytes => 6,
-      :http_method => 7,
+      :http_method => 7
       #:method_name => 8,
     }    
   end
