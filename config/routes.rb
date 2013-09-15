@@ -16,6 +16,8 @@ Xoplogs::Application.routes.draw do
   get "import_log/test"
   get "import_log/upload"
   match "import_log/upload_file"
+  match "import_log/parse"
+  match "import_log/parse_and_aggregate"
   match "import_log" => 'import_log#index'
 
   get "test/index"
@@ -69,7 +71,7 @@ Xoplogs::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  # root :to => 'welcome#index'
+  root :to => 'aggregated#index'
 
   # See how all your routes lay out with "rake routes"
 

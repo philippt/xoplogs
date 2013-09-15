@@ -25,4 +25,38 @@ class PartitionedAggregator
     end
   end
   
+  def self.aggregate(entries)
+    
+    raw = {
+      :success => {},
+      :failure => {}
+    }
+    
+    entries.each do |entry|
+      if entry != nil
+        corrected_timestamp = entry[:log_ts].to_i - entry[:log_ts].min
+        selector = entry[:return_code].to_i < 400 ? :success : :failure
+        hash = raw[selector]
+        hash[corrected_timestamp] = [] unless hash.has_key? corrected_timestamp
+        hash[corrected_timestamp] << entry
+      else
+        $logger.warn("nil entry")
+      end
+    end
+
+    aggregated = {
+      :success => [],
+      :failure => []
+    }
+
+    raw.each do |selector, entries|
+      entries.keys.sort.each do |minute|
+        aggregated[selector] << [
+          minute, entries[minute].size          
+        ]
+      end
+    end
+    aggregated
+  end
+  
 end

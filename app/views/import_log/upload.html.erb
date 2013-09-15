@@ -3,7 +3,7 @@
 host name: <input type="text" id="host_name" />
 service name: <input type="text" id="service_name" />
 <br/>
-parser: <input type="text" id="parser" />
+parser: <input type="text" id="parser" value="xop_apache" />
 
 <div id="dropbox">
   <span class="message">Drop logs here to upload. <br /><i>(if you dare)</i></span>
@@ -21,8 +21,9 @@ $(function(){
 		paramname:'pic',
 
 		maxfiles: 5,
-    	maxfilesize: 2, // in mb
-		url: '/import_log/upload_file',
+    	maxfilesize: 20, // in mb
+		//url: '/import_log/upload_file',
+		url: '/import_log/parse_and_aggregate',
 		
 		data: {
 			host_name: function() { return $('#host_name').val(); },

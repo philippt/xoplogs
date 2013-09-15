@@ -307,10 +307,14 @@ class AggregatedController < ApplicationController
   end
   
   def get_data
-    throw Exception.new("no such line : '#{params["line"]}'") unless lines.has_key?(params["line"])
-    decorator_block = lines[params["line"]]
-    data = with_aggregated_data do |entry|
-      decorator_block.call(entry)
+    data = {}
+    params["line"].split(',').each do |line|
+      raise "no such line : '#{line}'" unless lines.has_key? line
+      
+      decorator_block = lines[line]
+      data[line] = with_aggregated_data do |entry|
+        decorator_block.call(entry)
+      end
     end
     render :json => data
   end
