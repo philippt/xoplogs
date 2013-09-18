@@ -1,20 +1,23 @@
 require 'parsers/xop_apache'
+require 'parsers/apache_ssl_combined'
 require 'parsers/apache'
 require 'parsers/nginx'
 require 'parsers/squid'
 
 class AccessLogImporter
   
-  def initialize(host_name, service_name, file_type)
+  def initialize(host_name, service_name, file_type, options = {})
     @host_name = host_name
     @service_name = service_name
     @file_type = file_type
+    @options = options
     
     @known_parsers = {
       "apache" => Apache,
       "xop_apache" => XopApache,
-      "nginx" => Nginx,
       "squid" => Squid
+      "apache_ssl_combined" => ApacheSslCombined,
+      "nginx" => Nginx
     }
     
     @model_class = HttpAccessEntryTable
@@ -157,7 +160,8 @@ class AccessLogImporter
           # this entry could be parsed successfully
           # now, should we import it?
           # TODO we're losing some entries here in the overlapping second 
-          if entry[:log_ts].to_i <= last_imported_position
+          if (entry[:log_ts].to_i <= last_imported_position) and
+             ((not @options.has_key?("import_old_entries")) or (@options["import_old_entries"] != "true"))
             @ignored_old_count += 1
             next              
           end

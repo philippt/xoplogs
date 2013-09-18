@@ -21,10 +21,13 @@ class RawController < ApplicationController
   end
   
   def slab
-    prefix = /([^_]+)_/.match(params[:table_name]).captures.first
-    #@records =
-    @raw = HttpAccessEntryTable.raw_data(params[:table_name])
-    # TODO @raw = ServerLogTable.raw_data(params[:table_name])   
+    @prefix = /([^_]+)_/.match(params[:table_name]).captures.first
+    @raw = case @prefix
+    when 'sl'
+      ServerLogTable.raw_data(params[:table_name])
+    when 'hae' 
+      HttpAccessEntryTable.raw_data(params[:table_name])   
+    end
   end
   
 end

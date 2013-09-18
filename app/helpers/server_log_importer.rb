@@ -32,7 +32,7 @@ class ServerLogImporter < ImporterBase
         
         parsing_start = Time.now()
         entry = parser.parse(line)
-        puts "#{idx} #{entry}"
+        #puts "#{idx} #{entry}"
         parsing_stop = Time.now()
         @imported_file.processing_duration += parsing_stop.to_i - parsing_start.to_i
 
@@ -40,6 +40,7 @@ class ServerLogImporter < ImporterBase
         # write the stats into the database once in a while
         if @processed_count % 1000 == 0
           write_stats
+          print "."
         end
         
         if entry != nil          
@@ -60,7 +61,7 @@ class ServerLogImporter < ImporterBase
           @read_count += 1
         else
           line.chomp!.strip!          
-          last_entry[:stacktrace] += "|#{line}"
+          last_entry[:stacktrace] += "|#{line}" unless last_entry == nil
           
           # TODO improve error handling
           #$logger.debug "[UNPARSEABLE] #{line}"
@@ -70,6 +71,7 @@ class ServerLogImporter < ImporterBase
         idx += 1          
       end
     end
+    puts ""
     
     @parsed_entries.each do |the_day, entries|
       entries.map! do |entry|

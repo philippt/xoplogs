@@ -1,4 +1,7 @@
 <% @raw.each do |row| %>
-<pre><%#= row.log_ts %> <%#= row.log_level %>  <%#= row.class_name %> <%#= row.message %></pre>
-<pre><%= row.log_ts %> <%= row.method_name %> <%= row.query_string %>  <%= row.return_code %> <%= row.response_time_microsecs %>ms <%= row.user_agent %></pre>
+  <% if @prefix == 'sl' %>
+	<pre><%= row.log_ts %> <%= row.log_level %>  <%= row.class_name %> <%= row.message %></pre>
+  <% elsif @prefix == 'hae' %>
+        <pre><%= row.log_ts %> <%= row.method_name %> <%= row.query_string %>  <%= row.return_code %> <%= row.response_time_microsecs %>ms <%= row.user_agent %></pre>
+  <% end %>
 <% end %>
