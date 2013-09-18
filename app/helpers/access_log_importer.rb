@@ -1,6 +1,7 @@
 require 'parsers/xop_apache'
 require 'parsers/apache'
 require 'parsers/nginx'
+require 'parsers/squid'
 
 class AccessLogImporter
   
@@ -12,7 +13,8 @@ class AccessLogImporter
     @known_parsers = {
       "apache" => Apache,
       "xop_apache" => XopApache,
-      "nginx" => Nginx
+      "nginx" => Nginx,
+      "squid" => Squid
     }
     
     @model_class = HttpAccessEntryTable
@@ -166,7 +168,7 @@ class AccessLogImporter
           
           # and write tab-separatedly into the outfile
           the_values = [   
-            entry[:log_ts].strftime("%Y-%m-%d %H:%M:%S"),              
+            entry[:log_ts].utc.strftime("%Y-%m-%d %H:%M:%S"),              
             @host_name, 
             @service_name, 
             entry[:method_name],

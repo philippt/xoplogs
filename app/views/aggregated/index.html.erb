@@ -1,4 +1,29 @@
 <h2>aggregated access logs <%= ": #{params[:hosts]}" %></h2>
+
+<% if params[:debug] %>
+<table>
+	<thead>
+		<tr>
+			<th>timestamp</th>
+			<th>success</th>
+			<th>error</th>
+			<th>response time</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% @buckets.each do |bucket| %>
+		  <% ts, record = bucket.first, bucket.last %>
+		  <tr>
+		  	<td><%= Time.at(ts/1000) %></td>
+		  	<td><%= record.success_count %></td>
+		  	<td><%= record.failure_count %></td>
+		  	<td><%= record.response_time_micros_avg %></td>
+		  </tr>
+		<% end %>
+	</tbody>>
+</table>	
+<% end %>
+
 <%= render(:partial => "grapharea") %>
 
 

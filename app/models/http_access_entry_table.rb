@@ -43,6 +43,12 @@ EOF
     #'sl_' + self.host_name.gsub(/[\.-]/, "_") + '_' + self.service_name + '_' + self.the_day
   end
   
+  def self.raw_data(table_name)
+    statement = "select * from #{table_name} limit 100"
+    sanitized = ActiveRecord::Base.sanitize_sql_array([statement])
+    self.find_by_sql(sanitized)
+  end
+  
   def start_ts
     Time.parse(the_day)
   end
@@ -386,7 +392,6 @@ EOF
       File.delete(tarball_name)
     end
     
-    # update is_archived flag
     self.is_archived = false
     self.save()
   end

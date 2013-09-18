@@ -46,7 +46,7 @@ class HostAggregator
         
         $logger.info("finished aggregation run after #{Time.now() - start_ts} seconds")
         
-        status.aggregated_up_to = start_ts.strftime("%Y-%m-%d %H:%M:%S")        
+        status.aggregated_up_to = start_ts.utc.strftime("%Y-%m-%d %H:%M:%S")        
         status.save
       end
       

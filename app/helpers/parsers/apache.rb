@@ -1,7 +1,11 @@
 #require 'helpers/parsers/xop_apache'
 
-class Apache < XopApache
-
+class Apache
+  
+  def initialize(host_name, service_name)
+    @host_name = host_name
+    @service_name = service_name
+  end
 
   def parse(line)
     entry = nil
