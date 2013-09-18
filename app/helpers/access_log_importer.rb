@@ -15,7 +15,7 @@ class AccessLogImporter
     @known_parsers = {
       "apache" => Apache,
       "xop_apache" => XopApache,
-      "squid" => Squid
+      "squid" => Squid,
       "apache_ssl_combined" => ApacheSslCombined,
       "nginx" => Nginx
     }
