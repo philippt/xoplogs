@@ -39,7 +39,7 @@ EOF
 
   def table_name
     # TODO [refactor] move to base
-    'hae_' + self.host_name.gsub(/[\.-]/, "_") + '_' + self.service_name + '_' + self.the_day
+    'hae_' + self.host_name.gsub(/[\.-]/, "_") + '_' + self.service_name.gsub(/[\.-]/, '_') + '_' + self.the_day
     #'sl_' + self.host_name.gsub(/[\.-]/, "_") + '_' + self.service_name + '_' + self.the_day
   end
   
