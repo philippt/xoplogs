@@ -14,7 +14,9 @@ class XopApache
     #
     #         '1259441327 [28/Nov/2009:21:48:47 +0100] amf.staging.bettermarks.com 10.51.10.2 78.53.11.124 200 2117b 29000micros - "POST /exercise/ HTTP/1.1" "http://static.staging.bettermarks.com/bm_miniExercisePreview.swf" "Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.0.15) Gecko/2009102815 Ubuntu/9.04 (jaunty) Firefox/3.0.15"'
     #          epoch                host    remote ip   x_forwarded_for                status  bytes   microsecs     auth?   method    url                version  ref      useragent
-    result = /^([\d\.]+)\s+\[.+\]\s+(\S+)\s+(.+)\s+((?:[\d\.\w]+,\s)*[\d+\.\w]+)\s+(\d+)\s+(.+)b\s+(\d+)micros\s+(\S+)\s+"(\w+)\s+(\S+?)(?:\?(.+))?\s+(.+)"\s+"(.+)"\s+"(.+)"$/.match(line)
+    #result = /^([\d\.]+)\s+\[.+\]\s+(\S+)\s+(.+)\s+((?:[\d\.\w]+,\s)*[\d+\.\w]+)\s+(\d+)\s+(.+)b\s+(\d+)micros\s+(\S+)\s+"(\w+)\s+(\S+?)(?:\?(.+))?\s+(.+)"\s+"(.+)"\s+"(.+)"$/.match(line)
+    #result = /^([\d\.]+)\s+\[.+\]\s+(\S+)\s+(.+)\s+((?:[\d\.\w]+,\s)*[\d+\.\w]+)\s+(\d+)\s+(.+)b\s+(\d+)micros\s+(\S+)\s+"(\w+)\s+(\S+?)(?:\?(.+))?"\s+"([^"]+)"\s+"([^"]+)"$/.match(line)
+    result = /^([\d\.]+)\s+\[.+\]\s+(\S+)\s+(.+)\s+((?:[\d\.\w]+,\s)*[\d+\.\w]+)\s+(\d+)\s+(.+)b\s+(\d+)micros\s+(\S+)\s+"(\w+)\s+(\S+?)(?:\?(.+))?(?:\s+(.+))?"\s+"([^"]+)"\s+"([^"]+)"$/.match(line)
     if result then
       entry = {
         :log_ts => Time.at(result.captures[0].to_i),
