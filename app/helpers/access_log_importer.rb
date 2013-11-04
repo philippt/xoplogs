@@ -3,6 +3,7 @@ require 'parsers/apache_ssl_combined'
 require 'parsers/apache'
 require 'parsers/nginx'
 require 'parsers/squid'
+require 'parsers/log4j'
 
 class AccessLogImporter
   
@@ -17,7 +18,8 @@ class AccessLogImporter
       "xop_apache" => XopApache,
       "squid" => Squid,
       "apache_ssl_combined" => ApacheSslCombined,
-      "nginx" => Nginx
+      "nginx" => Nginx,
+      "log4j" => Log4j
     }
     
     @model_class = HttpAccessEntryTable
