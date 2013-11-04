@@ -54,23 +54,46 @@ class ImportLogController < ApplicationController
     end
     
   end
-  
+
   def parse_data
-    file_name = params[:pic].tempfile.to_path.to_s
     parser = AccessLogImporter.new('no.such.host', 'dummy', params[:parser]).parser
     
     entries = []
-    File.open(file_name, "r") do |infile|
-      while (line = infile.gets)
-        parsing_start = Time.now()
-        entry = parser.parse(line)
-        parsing_stop = Time.now()
-        entries << entry
+    if params[:pic] and params[:pic].respond_to?(:tempfile)
+      file_name = params[:pic].tempfile.to_path.to_s
+      
+      File.open(file_name, "r") do |infile|
+        while (line = infile.gets)
+          entries << parser.parse(line)
+        end
       end
+    elsif params[:lines]
+      params[:lines].each do |line|
+        entries << parser.parse(line)
+      end 
     end
+    
+    puts "parsed #{entries.size} entries with #{params[:parser]}"
     
     entries
   end
+  
+#  def parse_data
+#    file_name = params[:pic].tempfile.to_path.to_s
+#    parser = AccessLogImporter.new('no.such.host', 'dummy', params[:parser]).parser
+#    
+#    entries = []
+#    File.open(file_name, "r") do |infile|
+#      while (line = infile.gets)
+#        parsing_start = Time.now()
+#        entry = parser.parse(line)
+#        parsing_stop = Time.now()
+#        entries << entry
+#      end
+#    end
+#    
+#    entries
+#  end
   
   def parse
     render :json => parse_data
