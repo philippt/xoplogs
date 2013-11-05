@@ -66,6 +66,8 @@ EOF
     )
   end
   
+  
+  
   # deletes the input file afterwards
   def restore_from_archive(file_name = nil)
     file_name = archive_file_name if file_name == nil

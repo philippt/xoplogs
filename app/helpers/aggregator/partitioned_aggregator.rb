@@ -49,10 +49,10 @@ class PartitionedAggregator
       :failure => []
     }
 
-    raw.each do |selector, entries|
-      entries.keys.sort.each do |minute|
+    raw.each do |selector, e|
+      e.keys.sort.each do |minute|
         aggregated[selector] << [
-          minute, entries[minute].size          
+          minute, e[minute].size          
         ]
       end
     end

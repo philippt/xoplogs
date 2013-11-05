@@ -6,11 +6,13 @@ class Log4j
   end
   
   def parse(line)
-    # 2013-11-04 17:18:52,356 INFO : de.comline.gkvsv.phmv.home.controller.HomeController - Welcome home! the client locale is de
+    # this works with a log4j config like
+    #   <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n" />
+    #
+    # 2013-11-05 15:53:54,252 [main] INFO  org.apache.catalina.startup.Catalina - Server startup in 126 ms
     
-              #0              1            2           3
-    #pattern = /([\d\s:,-]+)\s+(\w+)\s+:\s+(\S+)\s+-\s+(.+)$/
-    pattern = /([\d\s:,-]+)\s+(\S+)\s+(\S+)\s*(\w+):\s+(.+)/m
+              #0                1         2        3
+    pattern = /([\d\s:,-]+)\s+\[(\S+)\]\s+(\S+)\s+(.+?)\s+-\s+(.+)$/
     
     matched = pattern.match(line)
     if matched
@@ -19,9 +21,9 @@ class Log4j
           :log_ts => DateTime.parse(matched.captures[0]),
           :host_name => @host_name,
           :service_name => @service_name,
-          :log_level => matched.captures[1],
-          :class_name => matched.captures[2],
-          :message => matched.captures[3].strip.chomp,
+          :log_level => matched.captures[2],
+          :class_name => matched.captures[3],
+          :message => matched.captures[4].strip.chomp,
           :stacktrace => '' 
         }
       rescue => detail

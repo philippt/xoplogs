@@ -1,4 +1,5 @@
 require 'parsers/jboss_server_log'
+require 'parsers/log4j'
 require 'pp'
 
 class ServerLogImporter < ImporterBase
@@ -7,7 +8,8 @@ class ServerLogImporter < ImporterBase
     super(host_name, service_name, file_type)
     
     @known_parsers.merge!({
-      "jboss" => JbossServerLog
+      "jboss" => JbossServerLog,
+      "log4j" => Log4j
     })
     
     @model_class = ServerLogTable
