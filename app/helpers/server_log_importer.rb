@@ -7,8 +7,6 @@ class ServerLogImporter < ImporterBase
   def initialize(host_name, service_name, file_type, options = {})
     super(host_name, service_name, file_type, options)
     
-    @options = options
-    
     @known_parsers.merge!({
       "jboss" => JbossServerLog,
       "log4j" => Log4j
