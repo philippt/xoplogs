@@ -10,7 +10,14 @@ require 'logger'
 $logger = Logger.new("log/import_server_log.log")
 
 begin
-  importer = ServerLogImporter.new(host_name, service_name, file_type)
+  options = {}
+  if options_string != nil and options_string != ''
+    options_string.split(" ").each do |option_string|
+      (k,v) = option_string.split("=")
+      options[k] = v
+    end
+  end
+  importer = ServerLogImporter.new(host_name, service_name, file_type, options)
   importer.process_file(file_name)
 rescue AlreadyImportedError => e
   $logger.warn("duplicate file : #{e.message}")

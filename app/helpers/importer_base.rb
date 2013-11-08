@@ -1,9 +1,10 @@
 class ImporterBase
 
-  def initialize(host_name, service_name, file_type)
+  def initialize(host_name, service_name, file_type, options = {})
     @host_name = host_name
     @service_name = service_name
     @file_type = file_type
+    @options = options
     
     @known_parsers = {}
   end
@@ -25,7 +26,9 @@ class ImporterBase
     already_imported = ImportedFile.find_by_md5sum(md5sum_file)
     if already_imported
       $logger.warn "already imported this file - md5sum check matched (#{md5sum_file})"
-      raise AlreadyImportedError.new("already imported this file - md5sum check matched (#{md5sum_file})")
+      unless @options[:force]
+        raise AlreadyImportedError.new("already imported this file - md5sum check matched (#{md5sum_file})")
+      end
     end
     
     # find the last position until which we imported log files

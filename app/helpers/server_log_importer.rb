@@ -4,8 +4,10 @@ require 'pp'
 
 class ServerLogImporter < ImporterBase
   
-  def initialize(host_name, service_name, file_type)
-    super(host_name, service_name, file_type)
+  def initialize(host_name, service_name, file_type, options = {})
+    super(host_name, service_name, file_type, options)
+    
+    @options = options
     
     @known_parsers.merge!({
       "jboss" => JbossServerLog,
