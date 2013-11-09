@@ -1,4 +1,5 @@
-<h2>aggregated access logs <%= ": #{params[:hosts]}" %></h2>
+<% log_type = params[:type] || 'access' %>
+<h2>aggregated <%= log_type %> logs <%= ": #{params[:hosts].join(',')}" %></h2>
 
 <% if params[:debug] %>
 <table>
@@ -30,6 +31,7 @@
 <script id="source" language="javascript" type="text/javascript">
 
   function fetch_data() {
+    <% if log_type == 'access' %>
   	addLine("graph_request_count", 'count_errors', '/aggregated/graph_request_count_errors?<%= @current_filters %>', function(series) {
 	    series.color = 2;
 	    series.points.show = false;
@@ -45,7 +47,19 @@
 	    series.color = 1;
 	    series.points.show = false;
 	    series.label = "response time (in ms)"
-	  });        
+	  });
+	  <% elsif log_type == 'server_log' %>
+	  addLine("graph_server_log", 'info_count', '/aggregated/graph_server_log?level=info&<%= @current_filters.html_safe %>', function(series) {
+      series.color = 0;
+      series.points.show = true;
+      series.label = "info count"
+    });
+    addLine("graph_server_log", 'error_count', '/aggregated/graph_server_log?level=error&<%= @current_filters.html_safe %>', function(series) {
+      series.color = 2;
+      series.points.show = false;
+      series.label = "error count"
+    });
+	  <% end %>        
   }
   
   function start_update() {

@@ -151,32 +151,6 @@ EOF
     $logger.info "updated stats for #{self.service_name}@#{self.host_name} : #{row.success_sum} successful calls, #{row.failure_sum} failures between #{start_ts} and #{stop_ts}"
   end
   
-  def get_daily_stats_from_hours
-    statement = 
-      "select " + HttpAccessEntryTable.grouped_data_columns + " " +
-      "from access_by_service_per_hours " +
-      "where " + standard_condition
-      
-    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
-    AccessByServicePerHour.find_by_sql(sanitized)
-  end
-  
-  def get_hour_stats_from_minutes
-    statement = 
-      "select " + HttpAccessEntryTable.grouped_data_columns + ", year(log_ts) the_year, month(log_ts) the_month, day(log_ts) the_day, hour(log_ts) the_hour " +
-      "from access_by_service_per_mins " +
-      "where " + standard_condition + " " +
-      "group by year(log_ts), month(log_ts), day(log_ts), hour(log_ts)"
-      
-    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
-    result = {}
-    HttpAccessEntry.find_by_sql(sanitized).each do |row|
-      timestamp = Time.parse("#{row.the_year}-#{row.the_month}-#{row.the_day} #{row.the_hour}:00")
-      result[timestamp] = row
-    end
-    result
-  end
-  
   def get_grouped_entries(success = true)
     conditions = [ 
       "SELECT year(log_ts) the_year, month(log_ts) the_month, day(log_ts) the_day, hour(log_ts) the_hour, minute(log_ts) the_minute, count(1) the_count, avg(response_time_microsecs) the_avg " + 
@@ -195,6 +169,32 @@ EOF
       result[timestamp] = row
     end
     result
+  end
+  
+  def get_hour_stats_from_minutes
+    statement = 
+      "select " + HttpAccessEntryTable.grouped_data_columns + ", year(log_ts) the_year, month(log_ts) the_month, day(log_ts) the_day, hour(log_ts) the_hour " +
+      "from access_by_service_per_mins " +
+      "where " + standard_condition + " " +
+      "group by year(log_ts), month(log_ts), day(log_ts), hour(log_ts)"
+      
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
+    result = {}
+    HttpAccessEntry.find_by_sql(sanitized).each do |row|
+      timestamp = Time.parse("#{row.the_year}-#{row.the_month}-#{row.the_day} #{row.the_hour}:00")
+      result[timestamp] = row
+    end
+    result
+  end
+  
+  def get_daily_stats_from_hours
+    statement = 
+      "select " + HttpAccessEntryTable.grouped_data_columns + " " +
+      "from access_by_service_per_hours " +
+      "where " + standard_condition
+      
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
+    AccessByServicePerHour.find_by_sql(sanitized)
   end
   
   def HttpAccessEntryTable.find_table_for_aggregator    

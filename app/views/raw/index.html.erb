@@ -4,36 +4,38 @@
 <table class="display" id="slab_table">
   <thead>
     <tr>
+      <th>type</th>
     	<th>service</th>
-		<th>the_day</th>
-		<th>needs aggregation</th>
-		<th>assigned aggregator</th>
-		<th>last aggregated at</th>
-		<th>archived?</th>
-	</tr>
+  		<th>the_day</th>
+  		<th>needs aggregation</th>
+  		<th>assigned aggregator</th>
+  		<th>last aggregated at</th>
+  		<th>archived?</th>
+  	</tr>
   </thead>
   <tbody>
 	  <% @slabs.each do |slab| 
 	  %>
 	  <tr>
+	    <td><%= slab.type %></td>
 	  	<td><%= slab.service_name %></td>
-		<td>
-					
-		  <% if not slab.is_archived %>
-		  <a href="/raw/slab?table_name=<%= slab.table_name %>">
-		  <% end %>
-		  
-		     <%= slab.the_day %>
-			 
-		  <% if not slab.is_archived %>
-		  </a>
-		  <% end %>
-		  
-		</td>
-		<td><%= slab.needs_aggregation %></td>
-		<td><%= slab.active_aggregator_pid %></td>
-		<td><%= slab.last_aggregated_at %></td>
-		<td><%= slab.is_archived %></td>		
+		  <td>
+  					
+  		  <% if not slab.is_archived %>
+  		  <a href="/raw/slab?table_name=<%= slab.table_name %>">
+  		  <% end %>
+  		  
+  		     <%= slab.the_day %>
+  			 
+  		  <% if not slab.is_archived %>
+  		  </a>
+  		  <% end %>
+  		  
+  		</td>
+  		<td><%= slab.needs_aggregation %></td>
+  		<td><%= slab.active_aggregator_pid %></td>
+  		<td><%= slab.last_aggregated_at %></td>
+  		<td><%= slab.is_archived %></td>		
 	  </tr>
 	  <% end %>
   </tbody>

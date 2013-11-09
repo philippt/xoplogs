@@ -37,6 +37,14 @@ class AggregatedController < ApplicationController
     render_as_flot_json "response time", data
   end
   
+  def graph_server_log
+    params[:type] = 'server_log'
+    data = with_aggregated_data do |entry|
+      entry.send("#{params[:level]}_count".to_sym)
+    end
+    render_as_flot_json "#{params[:level]} count", data
+  end
+  
   def get_data
     throw Exception.new("no such line : '#{params["line"]}'") unless lines.has_key?(params["line"])
     decorator_block = lines[params["line"]]
@@ -137,11 +145,20 @@ class AggregatedController < ApplicationController
         # create a dummy entry so that the block that has been passed can keep
         # on working as if there were data
         #$logger.debug "filling gap at #{current_ts} with default values"
-        record = AccessPerDay.new(
-          :success_count => 0,
-          :failure_count => 0,
-          :response_time_micros_avg => 1000
-        )
+        if params[:type] == 'server_log'
+          record = SlStatsPerDay.new(
+            :debug_count => 0,
+            :info_count => 0,
+            :warn_count => 0,
+            :error_count => 0
+          )
+        else
+          record = AccessPerDay.new(
+            :success_count => 0,
+            :failure_count => 0,
+            :response_time_micros_avg => 1000
+          )
+        end        
         buckets << [
           current_ts * 1000,
           record
@@ -217,16 +234,18 @@ class AggregatedController < ApplicationController
 
     aggregation_levels = {}
 
-    class_name = "Access"
-
-    if params.has_key?(:hosts)
-      class_name = "AccessByHost"
-      aggregation_levels[:host] = true
+    class_name = case params[:type]
+      when 'server_log' then 'SlStats'
+      else 'Access'
     end
 
     if params.has_key?(:services)
-      class_name = "AccessByService"
+      class_name += "ByService"
+      aggregation_levels[:host] = true
       aggregation_levels[:service] = true
+    elsif params.has_key?(:hosts)
+      class_name += "ByHost"
+      aggregation_levels[:host] = true
     end
 
     class_name += "Per" + timeframe[:name_fragment]

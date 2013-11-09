@@ -8,7 +8,10 @@ class RawController < ApplicationController
         params[:host_name]
       ],
       :order => "the_day desc"
-    )
+    ).map do |x|
+      x["type"] = 'access' 
+      x
+    end
     
     @slabs += ServerLogTable.find(
       :all,
@@ -17,7 +20,10 @@ class RawController < ApplicationController
         params[:host_name]
       ],
       :order => "the_day desc"
-    )
+    ).map do |x|
+      x["type"] = 'server_log' 
+      x
+    end
   end
   
   def slab

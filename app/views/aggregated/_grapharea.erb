@@ -1,3 +1,4 @@
+<% log_type = params[:type] || 'access' %>
 <div id="grapharea">
 <%
 graph_width = 400
@@ -7,6 +8,7 @@ end
 graph_height = graph_width.to_i / 2
 %>
 	<ul id="graphs">
+	  <% if log_type == 'access' %>
 	  <li class="graphcontainer">
 	    <div id="graph_request_count" class="graph" style="width:<%= graph_width %>px;height:<%= graph_height %>px"></div>
 	    <p class="graph_subtitle">request count (per minute)</p>
@@ -15,6 +17,12 @@ graph_height = graph_width.to_i / 2
 	    <div id="graph_response_time" class="graph" style="width:<%= graph_width %>px;height:<%= graph_height %>px"></div>
 	    <p class="graph_subtitle">response time (in ms)</p>
 	  </li>
+	  <% elsif log_type == 'server_log' %>
+	  <li class="graphcontainer">
+      <div id="graph_server_log" class="graph" style="width:<%= graph_width %>px;height:<%= graph_height %>px"></div>
+      <p class="graph_subtitle">server log count (per level)</p>
+    </li>
+    <% end %>
 	</ul>
 </div>
 

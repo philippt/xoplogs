@@ -6,6 +6,7 @@ Xoplogs::Application.routes.draw do
   get "aggregated/graph_request_count_errors"
   get "aggregated/graph_request_count_total"
   get "aggregated/graph_response_time"
+  get "aggregated/graph_server_log"
   get "aggregated/get_data"
 
   get "raw/index"
