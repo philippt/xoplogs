@@ -1,5 +1,5 @@
 <% log_type = params[:type] || 'access' %>
-<h2>aggregated <%= log_type %> logs <%= ": #{params[:hosts].join(',')}" %></h2>
+<h2>aggregated <%= log_type %> logs <%= ": #{(params[:hosts] ? params[:hosts].join(',') : '')}" %></h2>
 
 <% if params[:debug] %>
 <table>

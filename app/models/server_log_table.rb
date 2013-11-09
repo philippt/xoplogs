@@ -146,14 +146,14 @@ EOF
       end
     end
     
-    file_name = "/var/lib/mysql/sl_stats_service_minutes"
+    file_name = "/var/lib/mysql_import/sl_stats_service_minutes"
     File.open(file_name, "w") do |outfile|
       minutes.each do |row|
         outfile << row.join("\t")
         outfile << "\n"  
       end
     end
-    system "sudo `which chown` mysql: #{file_name}"
+    #system "sudo `which chown` mysql: #{file_name}"
     ActiveRecord::Base.connection.execute(
       # TODO "LOAD DATA LOCAL INFILE '#{file_name}' INTO TABLE #{table_name} " +
       "LOAD DATA INFILE '#{file_name}' REPLACE INTO TABLE sl_stats_by_service_per_mins " +
@@ -186,14 +186,14 @@ EOF
       hours << row
     end
     
-    file_name = "/var/lib/mysql/sl_stats_service_hours"
+    file_name = "/var/lib/mysql_import/sl_stats_service_hours"
     File.open(file_name, "w") do |outfile|
       hours.each do |row|
         outfile << row.join("\t")
         outfile << "\n"  
       end
     end
-    system "sudo `which chown` mysql: #{file_name}"
+    #system "sudo `which chown` mysql: #{file_name}"
     ActiveRecord::Base.connection.execute(
       # TODO "LOAD DATA LOCAL INFILE '#{file_name}' INTO TABLE #{table_name} " +
       "LOAD DATA INFILE '#{file_name}' REPLACE INTO TABLE sl_stats_by_service_per_hours " +
