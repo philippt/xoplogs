@@ -185,7 +185,7 @@ class HostAggregator
         outfile << "\n"  
       end
     end
-    system "sudo `which chown` mysql: #{file_name}"
+    #system "sudo `which chown` mysql: #{file_name}"
     ActiveRecord::Base.connection.execute(
       "LOAD DATA INFILE '#{file_name}' REPLACE INTO TABLE sl_stats_by_host_per_mins " +
       "(log_ts,host_name,debug_count,info_count,warn_count,error_count);"
@@ -220,7 +220,7 @@ class HostAggregator
         outfile << "\n"  
       end
     end
-    system "sudo `which chown` mysql: #{file_name}"
+    #system "sudo `which chown` mysql: #{file_name}"
     ActiveRecord::Base.connection.execute(
       "LOAD DATA INFILE '#{file_name}' REPLACE INTO TABLE sl_stats_by_host_per_hours " +
       "(log_ts,host_name,debug_count,info_count,warn_count,error_count);"
@@ -345,7 +345,7 @@ class HostAggregator
         outfile << "\n"  
       end
     end
-    system "sudo `which chown` mysql: #{file_name}"
+    #system "sudo `which chown` mysql: #{file_name}"
     ActiveRecord::Base.connection.execute(
       "LOAD DATA INFILE '#{file_name}' REPLACE INTO TABLE sl_stats_per_mins " +
       "(log_ts,debug_count,info_count,warn_count,error_count);"
@@ -378,7 +378,7 @@ class HostAggregator
         outfile << "\n"  
       end
     end
-    system "sudo `which chown` mysql: #{file_name}"
+    #system "sudo `which chown` mysql: #{file_name}"
     ActiveRecord::Base.connection.execute(
       "LOAD DATA INFILE '#{file_name}' REPLACE INTO TABLE sl_stats_per_hours " +
       "(log_ts,debug_count,info_count,warn_count,error_count);"
