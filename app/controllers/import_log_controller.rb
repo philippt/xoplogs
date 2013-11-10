@@ -85,7 +85,7 @@ class ImportLogController < ApplicationController
   def parse_and_aggregate
     entries = parse_data
     
-    stats = PartitionedAggregator.aggregate(entries)
+    stats = PartitionedAggregator.aggregate(entries, params[:type])
     
     stats.each do |selector, e|
       e.each do |entry|

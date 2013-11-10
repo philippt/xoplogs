@@ -8,8 +8,11 @@ class Log4j
   def parse(line)
     # this works with a log4j config like
     #   <param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n" />
+    # or (for timezoned timestamps)
+    #   <param name="ConversionPattern" value="%d{yyyy.M.d H:m:ss Z} [%t] %-5p %c - %m%n" />
     #
     # 2013-11-05 15:53:54,252 [main] INFO  org.apache.catalina.startup.Catalina - Server startup in 126 ms
+    # 2013.11.10 16:27:03 +0100 [main] INFO  org.apache.catalina.startup.Catalina - Server startup in 173 ms
     
               #0                1         2        3
     pattern = /([\d\s:,+-]+)\s+\[(\S+)\]\s+(\S+)\s+(.+?)\s+-\s+(.+)$/
