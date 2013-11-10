@@ -12,7 +12,7 @@ class Log4j
     # 2013-11-05 15:53:54,252 [main] INFO  org.apache.catalina.startup.Catalina - Server startup in 126 ms
     
               #0                1         2        3
-    pattern = /([\d\s:,-]+)\s+\[(\S+)\]\s+(\S+)\s+(.+?)\s+-\s+(.+)$/
+    pattern = /([\d\s:,+-]+)\s+\[(\S+)\]\s+(\S+)\s+(.+?)\s+-\s+(.+)$/
     
     matched = pattern.match(line)
     if matched
