@@ -81,7 +81,7 @@ class ServerLogImporter < ImporterBase
         @model_class.import_column_list.each do |column|
           the_values << entry[column.to_sym]
         end
-        the_values[0] = entry[:log_ts].strftime("%Y-%m-%d %H:%M:%S")
+        the_values[0] = entry[:log_ts].utc.strftime("%Y-%m-%d %H:%M:%S")
         the_values
       end
     end

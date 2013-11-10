@@ -39,8 +39,8 @@ class ApplicationController < ActionController::Base
       @start_ts = @stop_ts - (60 * 60 * params[:interval_hours].to_i)
     end
 
-    $logger.debug  "+++ start_ts is : #{@start_ts}"
-    $logger.debug  "+++ stop_ts is : #{@stop_ts}"
+    $logger.debug  "+++ start_ts is : #{@start_ts.utc}"
+    $logger.debug  "+++ stop_ts is : #{@stop_ts.utc}"
     
 
     @filters = params
@@ -48,10 +48,10 @@ class ApplicationController < ActionController::Base
     #@filters[:bucket_count] = 40
 
     @current_params = {}
-    @current_params["start_ts"] = @start_ts.to_i
-    @current_params["stop_ts"] = @stop_ts.to_i
+    @current_params["start_ts"] = @start_ts.utc.to_i
+    @current_params["stop_ts"] = @stop_ts.utc.to_i
 
-    current_filters = "start_ts=#{@start_ts.to_i}&stop_ts=#{@stop_ts.to_i}"
+    current_filters = "start_ts=#{@start_ts.utc.to_i}&stop_ts=#{@stop_ts.utc.to_i}"
     [:services, :hosts].each do |param|
       if params[param]
         params[param].each do |h|
