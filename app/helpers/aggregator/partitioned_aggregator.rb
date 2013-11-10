@@ -1,11 +1,10 @@
+# populates statistics tables:
+#   aggregates from http access entries (hae) tables into access_by_service_* tables,
+#         also from server log (sl) tables into sl_stats_by_service_*
 class PartitionedAggregator
   
-  # populates the access statistics tables
-  # (aggregates data from http_access_entries into the access_* tables)
   def write_access_stats
-
     while (true) do
-      # find a table that needs aggregation
       [ HttpAccessEntryTable, ServerLogTable ].each do |x| 
         target_table = x.find_table_for_aggregator 
         if target_table != nil
@@ -17,13 +16,13 @@ class PartitionedAggregator
           target_table.needs_aggregation = false
           target_table.active_aggregator_pid = nil
           target_table.last_aggregated_at = Time.now().utc
-          #target_table.last_aggregated_at = Time.now().strftime("%Y-%m-%d %H:%M:%S")
           target_table.save
         else
-          $logger.info("no tables found to aggregate - gonna sleep for 10 secs")
-          sleep 10
+          $logger.info("no #{x} tables found to aggregate")          
         end
       end
+      $logger.info "gonna sleep for 10 secs"
+      sleep 10
     end
   end
   

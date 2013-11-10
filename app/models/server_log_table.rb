@@ -28,6 +28,10 @@ CREATE TABLE IF NOT EXISTS %s (
 
 EOF
 
+  def self.mysql_loader_dir
+    $app_config['mysql_loader_dir'] || "/var/lib/mysql_import/"
+  end 
+
   def table_name
     'sl_' + self.host_name.gsub(/[\.-]/, "_") + '_' + self.service_name + '_' + self.the_day
   end
@@ -105,6 +109,16 @@ EOF
     the_table
   end
   
+  def self.find_recently_upgraded_service_stat_slabs(newer_than_timestamp)
+    statement = "select distinct host_name, the_day from server_log_tables where needs_aggregation = 0 and last_aggregated_at is not NULL and last_aggregated_at >= '#{newer_than_timestamp.strftime("%Y-%m-%d %H:%M:%S")}'"
+    $logger.info "sanitized : #{statement}"
+    sanitized = ActiveRecord::Base.sanitize_sql_array(statement)
+    ServerLogTable.find_by_sql(sanitized)
+  end
+  
+  
+  
+  
   def update_stats
     $logger.info "aggregating server log stats from #{self.table_name}..."
     
@@ -146,7 +160,7 @@ EOF
       end
     end
     
-    file_name = "/var/lib/mysql_import/sl_stats_service_minutes"
+    file_name = "#{ServerLogTable.mysql_loader_dir}/sl_stats_service_minutes"
     File.open(file_name, "w") do |outfile|
       minutes.each do |row|
         outfile << row.join("\t")
@@ -186,7 +200,7 @@ EOF
       hours << row
     end
     
-    file_name = "/var/lib/mysql_import/sl_stats_service_hours"
+    file_name = "#{ServerLogTable.mysql_loader_dir}/sl_stats_service_hours"
     File.open(file_name, "w") do |outfile|
       hours.each do |row|
         outfile << row.join("\t")
@@ -195,7 +209,6 @@ EOF
     end
     #system "sudo `which chown` mysql: #{file_name}"
     ActiveRecord::Base.connection.execute(
-      # TODO "LOAD DATA LOCAL INFILE '#{file_name}' INTO TABLE #{table_name} " +
       "LOAD DATA INFILE '#{file_name}' REPLACE INTO TABLE sl_stats_by_service_per_hours " +
       "(log_ts,host_name,service_name,debug_count,info_count,warn_count,error_count);"
     )
@@ -218,12 +231,14 @@ EOF
     
     stats
   end
-  
+
+
+
+
   def group_by_level_and_minute
     conditions = [ 
       "SELECT year(log_ts) the_year, month(log_ts) the_month, day(log_ts) the_day, hour(log_ts) the_hour, minute(log_ts) the_minute, log_level, count(1) the_count " + 
       "FROM #{table_name} " +
-      #"WHERE return_code " + (success ? "< 400" : ">= 400") + " " + 
       "GROUP BY year(log_ts), month(log_ts), day(log_ts), hour(log_ts), minute(log_ts), log_level " +
       "ORDER BY log_ts"
     ]
@@ -289,6 +304,113 @@ EOF
     end
     
     result
+  end
+  
+  def self.group_service_stats_by_host(host_name, starting_from_timestamp)
+    stop_timestamp = starting_from_timestamp + 24 * 60 * 60
+    statement = 
+    "SELECT " + ServerLogTable.grouped_data_columns + ", year(log_ts) the_year, month(log_ts) the_month, day(log_ts) the_day, hour(log_ts) the_hour, minute(log_ts) the_minute " +
+    "FROM sl_stats_by_service_per_mins " +
+    "where host_name = '#{host_name}' and log_ts >= '#{starting_from_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' and log_ts < '#{stop_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' " +
+    "group by year(log_ts), month(log_ts), day(log_ts), hour(log_ts), minute(log_ts)"
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
+    result = {}
+    ServerLogTable.find_by_sql(sanitized).each do |row|
+      timestamp = Time.parse("#{row.the_year}-#{row.the_month}-#{row.the_day} #{row.the_hour}:#{row.the_minute}")
+      
+      stats = {}
+      ServerLogTable.log_levels.each do |log_level|
+        column_name = "#{log_level}_sum"
+        stats[log_level] = row.send(column_name.to_sym).to_i
+      end
+      result[timestamp] = stats
+    end
+    result
+  end
+  
+  def self.group_host_stats_by_hour(host_name, starting_from_timestamp)
+    stop_timestamp = starting_from_timestamp + 24 * 60 * 60
+    statement = 
+    "SELECT " + grouped_data_columns + ", year(log_ts) the_year, month(log_ts) the_month, day(log_ts) the_day, hour(log_ts) the_hour " +
+    "FROM sl_stats_by_service_per_mins " +
+    "where host_name = '#{host_name}' and log_ts >= '#{starting_from_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' and log_ts < '#{stop_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' " +
+    "group by year(log_ts), month(log_ts), day(log_ts), hour(log_ts)"
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
+    result = {}
+    ServerLogTable.find_by_sql(sanitized).each do |row|
+      timestamp = Time.parse("#{row.the_year}-#{row.the_month}-#{row.the_day} #{row.the_hour}:00")
+      
+      stats = {}
+      ServerLogTable.log_levels.each do |log_level|
+        column_name = "#{log_level}_sum"
+        stats[log_level] = row.send(column_name.to_sym).to_i
+      end
+      result[timestamp] = stats
+    end
+    result
+  end
+  
+  def self.group_host_stats_by_day(host_name, starting_from_timestamp)
+    stop_timestamp = starting_from_timestamp + 24 * 60 * 60
+    
+    statement = 
+      "select " + grouped_data_columns + " " +
+      "from sl_stats_by_host_per_hours " +
+      "where host_name = '#{host_name}' and log_ts >= '#{starting_from_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' and log_ts < '#{stop_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' "
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
+    SlStatsByHostPerHour.find_by_sql(sanitized)
+  end
+  
+  def self.level_hash(row)
+    stats = {}
+    log_levels.each do |log_level|
+      column_name = "#{log_level}_sum"
+      stats[log_level] = row.send(column_name.to_sym).to_i
+    end
+    stats
+  end
+  
+  def self.group_totals_by_minute(starting_from_timestamp)
+    stop_timestamp = starting_from_timestamp + 24 * 60 * 60
+    statement = 
+    "SELECT " + grouped_data_columns + ", year(log_ts) the_year, month(log_ts) the_month, day(log_ts) the_day, hour(log_ts) the_hour, minute(log_ts) the_minute " +
+    "FROM sl_stats_by_host_per_mins " +
+    "where log_ts >= '#{starting_from_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' and log_ts < '#{stop_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' " +
+    "group by year(log_ts), month(log_ts), day(log_ts), hour(log_ts), minute(log_ts)"
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
+    result = {}
+    ServerLogTable.find_by_sql(sanitized).each do |row|
+      timestamp = Time.parse("#{row.the_year}-#{row.the_month}-#{row.the_day} #{row.the_hour}:#{row.the_minute}")
+      result[timestamp] = level_hash(row)
+    end
+    result
+  end
+  
+  def self.group_totals_by_hour(starting_from_timestamp)
+    stop_timestamp = starting_from_timestamp + 24 * 60 * 60
+    statement = 
+    "SELECT " + grouped_data_columns + ", year(log_ts) the_year, month(log_ts) the_month, day(log_ts) the_day, hour(log_ts) the_hour " +
+    "FROM sl_stats_by_host_per_hours " +
+    "where log_ts >= '#{starting_from_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' and log_ts < '#{stop_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' " +
+    "group by year(log_ts), month(log_ts), day(log_ts), hour(log_ts)"
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
+    result = {}
+    ServerLogTable.find_by_sql(sanitized).each do |row|
+      timestamp = Time.parse("#{row.the_year}-#{row.the_month}-#{row.the_day} #{row.the_hour}:00")
+      result[timestamp] = level_hash(row)
+    end
+    result
+  end
+  
+  def self.group_totals_by_day(starting_from_timestamp)
+    stop_timestamp = starting_from_timestamp + 24 * 60 * 60
+    
+    statement = 
+      "select " + grouped_data_columns + " " +
+      "from sl_stats_per_hours " +
+      "where log_ts >= '#{starting_from_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' and log_ts < '#{stop_timestamp.strftime("%Y-%m-%d %H:%M:%S")}' "
+    sanitized = ActiveRecord::Base.send(:sanitize_sql_array, statement)
+    SlStatsPerHour.find_by_sql(sanitized)
   end
   
   

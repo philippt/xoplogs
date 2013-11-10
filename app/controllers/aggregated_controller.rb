@@ -101,8 +101,8 @@ class AggregatedController < ApplicationController
     @stop_ts += (60 - @stop_ts.utc.min) * 60 if interval >= 60 * 60 and @stop_ts.utc.min > 0
     @stop_ts += (24 - @stop_ts.utc.hour) * 60 * 60 if interval >= 60 * 60 * 24 and @stop_ts.utc.hour > 0
 
-    $logger.debug "normalized start parameter : #{@start_ts.utc} (#{@start_ts.utc.to_i})"
-    $logger.debug "normalized stop parameter : #{@stop_ts.utc} (#{@stop_ts.utc.to_i})"
+    $logger.info "normalized start parameter : #{@start_ts.utc} (#{@start_ts.utc.to_i})"
+    $logger.info "normalized stop parameter : #{@stop_ts.utc} (#{@stop_ts.utc.to_i})"
 
     {
       :name_fragment => selected_unit[:name].capitalize,
