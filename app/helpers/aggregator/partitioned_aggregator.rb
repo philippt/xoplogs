@@ -26,20 +26,20 @@ class PartitionedAggregator
     end
   end
   
-  def self.aggregate(entries, type = 'access')
-    
+  def self.aggregate(entries, log_type = "access")
     raw = {
     }
     
     entries.each do |entry|
-      if entry != nil
+      if entry
         corrected_timestamp = entry[:log_ts].to_i - entry[:log_ts].min
         
-        selector = if type == 'access'
-          entry[:return_code].to_i < 400 ? :success : :failure
-        elsif type == 'server_log'
+        selector = if (log_type == 'access' || log_type == 'vop')
+          (entry[:return_code].to_i < 400) ? :success : :failure
+        elsif log_type == 'server_log'
           entry[:log_level]
         end
+        raise "[woopsie] no selector found - that's probably a bug" unless selector
         
         raw[selector] = {} unless raw.has_key? selector
         hash = raw[selector]
