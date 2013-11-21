@@ -8,6 +8,8 @@ Xoplogs::Application.routes.draw do
   get "aggregated/graph_response_time"
   get "aggregated/graph_server_log"
   get "aggregated/get_data"
+  get "aggregated/host_list"
+  get "aggregated/services_list"
 
   get "raw/index"
   get "raw/slab"

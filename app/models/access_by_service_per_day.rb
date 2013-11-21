@@ -2,7 +2,7 @@ class AccessByServicePerDay < ActiveRecord::Base
 
   attr_accessible :log_ts, :host_name, :service_name, :success_count, :failure_count, :response_time_micros_avg
 
-   def self.find_for_lookup(start_ts, stop_ts, host_filter = nil)
+   def self.find_distinct(start_ts, stop_ts, host_filter = nil)
      result = []
      statement = "SELECT DISTINCT host_name, service_name " +
                  "FROM #{self.table_name} " +
@@ -23,5 +23,5 @@ class AccessByServicePerDay < ActiveRecord::Base
      end
      result
   end
-
+  
 end

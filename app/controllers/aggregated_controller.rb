@@ -7,6 +7,43 @@ class AggregatedController < ApplicationController
     with_aggregated_data { |x| x }
   end
   
+  def host_list
+    sources = { 
+      'access' => AccessByHostPerDay,
+      'server_log' => SlStatsByHostPerDay 
+    }
+    
+    result = {}
+    sources.each do |name, model|
+      hosts = model.find_distinct(@start_ts, @stop_ts, 'host_name')
+      hosts.each do |host|
+        result[host] ||= []
+        result[host] << name
+      end
+    end
+    
+    render :json => result                 
+  end
+  
+  def services_list
+    sources = { 
+      'access' => AccessByServicePerDay,
+      'server_log' => SlStatsByServicePerDay 
+    }
+    
+    result = {}
+    sources.each do |type, model|
+      model.find_distinct(@start_ts, @stop_ts).each do |row|
+        host = row['host_name']
+        result[host] ||= {}
+        result[host][type] ||= []
+        result[host][type] << row['service_name'] 
+      end
+    end
+    
+    render :json => result    
+  end
+  
   # the following methods are called from javascript in order to fetch data for
   # individual data lines (result is flot-style json)  
   def graph_request_count_success
