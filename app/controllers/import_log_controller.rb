@@ -56,7 +56,10 @@ class ImportLogController < ApplicationController
   end
 
   def parse_data
-    parser = AccessLogImporter.new('no.such.host', 'dummy', params[:parser]).parser
+    the_model = (params[:type] && params[:type] == 'server_log') ? ServerLogImporter : AccessLogImporter
+    $logger.debug "model : #{the_model}"
+    parser = the_model.new('no.such.host', 'dummy', params[:parser]).parser
+    $logger.debug "parser : #{parser}"
     
     entries = []
     if params[:pic] and params[:pic].respond_to?(:tempfile)
@@ -69,7 +72,12 @@ class ImportLogController < ApplicationController
       end
     elsif params[:lines]
       params[:lines].each do |line|
-        entries << parser.parse(line)
+	parsed = parser.parse(line)
+        if parsed
+          entries << parsed
+        else
+          $logger.warn "could not parse : #{line}"
+        end
       end 
     end
     

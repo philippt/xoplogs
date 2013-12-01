@@ -222,7 +222,7 @@ EOF
     count_values = levels.map { |x| "#{stats[x]}" }.join(', ')
     
     statement = "INSERT INTO sl_stats_by_service_per_days(log_ts, host_name, service_name, #{count_columns}) " +
-             "VALUES('#{start_ts.strftime("%Y-%m-%d %H:%M:%S")}', '#{self.service_name}', '#{self.host_name}', #{count_values}) " +
+             "VALUES('#{start_ts.strftime("%Y-%m-%d %H:%M:%S")}', '#{self.host_name}', '#{self.service_name}', #{count_values}) " +
              "ON DUPLICATE KEY UPDATE " +
              levels.map{ |x| "#{x}_count = VALUES(#{x}_count)" }.join(', ')
                  
