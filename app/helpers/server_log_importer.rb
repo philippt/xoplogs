@@ -1,5 +1,6 @@
 require 'parsers/jboss_server_log'
 require 'parsers/log4j'
+require 'parsers/ruby_logger'
 require 'pp'
 
 class ServerLogImporter < ImporterBase
@@ -9,7 +10,8 @@ class ServerLogImporter < ImporterBase
     
     @known_parsers.merge!({
       "jboss" => JbossServerLog,
-      "log4j" => Log4j
+      "log4j" => Log4j,
+      "ruby_logger" => RubyLogger
     })
     
     @model_class = ServerLogTable
@@ -34,7 +36,6 @@ class ServerLogImporter < ImporterBase
         
         parsing_start = Time.now()
         entry = parser.parse(line)
-        #puts "#{idx} #{entry}"
         parsing_stop = Time.now()
         @imported_file.processing_duration += parsing_stop.to_i - parsing_start.to_i
 
@@ -45,7 +46,7 @@ class ServerLogImporter < ImporterBase
           print "."
         end
         
-        if entry != nil          
+        if entry          
           # TODO we're losing some entries here in the overlapping second 
           if entry[:log_ts].to_i <= last_imported_position
             @ignored_old_count += 1
@@ -62,18 +63,16 @@ class ServerLogImporter < ImporterBase
           
           @read_count += 1
         else
-          line.chomp!.strip!          
-          last_entry[:stacktrace] += "|#{line}" unless last_entry == nil
+          last_entry[:stacktrace] += "|#{line.chomp.strip}" unless last_entry == nil
           
           # TODO improve error handling
           #$logger.debug "[UNPARSEABLE] #{line}"
-          #@unparseable_count += 1
+          @unparseable_count += 1
         end
         
         idx += 1          
       end
     end
-    puts ""
     
     @parsed_entries.each do |the_day, entries|
       entries.map! do |entry|

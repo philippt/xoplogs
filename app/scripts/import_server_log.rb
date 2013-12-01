@@ -1,7 +1,7 @@
 (file_name, file_type, host_name, service_name, options_string) = ARGV
 unless file_name and file_type and host_name and service_name
-  known_parsers = %w|jboss|
-  puts "Usage: #{__FILE__} /path/to/log/file <#{known_parsers.join('|')}> <host_name> <service_name>"
+  known_parsers = %w|jboss log4j ruby_logger|
+  puts "Usage: #{__FILE__} /path/to/log/file <#{known_parsers.join('|')}> <host_name> <service_name> [options]"
   Kernel.exit(1)
 end
 

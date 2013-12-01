@@ -51,8 +51,7 @@ EOF
   end
   
   def self.import_column_list
-    %w|log_ts host_name service_name| +
-    %w|log_level class_name message stacktrace|
+    %w|log_ts host_name service_name log_level class_name message stacktrace|
   end
   
   def self.import_columns
@@ -432,7 +431,6 @@ EOF
       "(#{ServerLogTable.import_columns});"
     )
     
-    #File.delete(file_name)
     if File.exists?(tarball_name)
       File.delete(tarball_name)
     end
