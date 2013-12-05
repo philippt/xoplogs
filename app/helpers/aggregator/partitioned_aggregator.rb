@@ -35,6 +35,9 @@ class PartitionedAggregator
 #      :time => [ :response_time_micros ]
 #    }
     
+    #first = Time.parse(entries.first[:log_ts])
+    #last = Time.parse(entries.last[:log_ts])
+    
     entries.each do |entry|
       if entry
         corrected_timestamp = entry[:log_ts].to_i - entry[:log_ts].sec - entry[:log_ts].min
@@ -60,10 +63,10 @@ class PartitionedAggregator
     }
 
     raw.each do |selector, e|
-      e.keys.sort.each do |minute|
+      e.keys.sort.each do |bucket|
         aggregated[selector] = [] unless aggregated.has_key? selector
         aggregated[selector] << [
-          minute, e[minute].size          
+          bucket, e[bucket].size          
         ]
       end
     end

@@ -72,7 +72,7 @@ class ImportLogController < ApplicationController
       end
     elsif params[:lines]
       params[:lines].each do |line|
-	parsed = parser.parse(line)
+	      parsed = parser.parse(line)
         if parsed
           entries << parsed
         else
