@@ -101,7 +101,11 @@ class ImportLogController < ApplicationController
       end
     end
     
-    render :json => stats.to_json()
+    json = {
+      'stats' => stats,
+      'parsed' => entries
+    }
+    render :json => json.to_json()
   end
   
 end

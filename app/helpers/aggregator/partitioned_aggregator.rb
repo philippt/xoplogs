@@ -29,10 +29,15 @@ class PartitionedAggregator
   def self.aggregate(entries, log_type = "access")
     raw = {
     }
+
+#    selector_types =  {
+#      :count => [ :success, :failure, :debug, :info, :warn, :error ],
+#      :time => [ :response_time_micros ]
+#    }
     
     entries.each do |entry|
       if entry
-        corrected_timestamp = entry[:log_ts].to_i - entry[:log_ts].min
+        corrected_timestamp = entry[:log_ts].to_i - entry[:log_ts].sec - entry[:log_ts].min
         
         selector = if (log_type == 'access' || log_type == 'vop')
           (entry[:return_code].to_i < 400) ? :success : :failure
@@ -62,6 +67,18 @@ class PartitionedAggregator
         ]
       end
     end
+
+#    aggregated['response_time_ms'] = []
+#    raw[:success].each do |ts, bucket|
+#      total = 0
+#      bucket.each do |entry|
+#        total += entry['response_time_microsecs'] unless entry['response_time_microsecs'] == nil
+#      end
+#      aggregated['response_time_ms'] << [
+#        ts, (total / bucket.size)
+#      ]
+#    end
+
     aggregated
   end
   
