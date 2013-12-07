@@ -35,6 +35,9 @@ class PartitionedAggregator
 #      :time => [ :response_time_micros ]
 #    }
     
+    #first = Time.parse(entries.first[:log_ts])
+    #last = Time.parse(entries.last[:log_ts])
+    
     entries.each do |entry|
       if entry
         corrected_timestamp = entry[:log_ts].to_i - entry[:log_ts].sec - entry[:log_ts].min
@@ -60,24 +63,33 @@ class PartitionedAggregator
     }
 
     raw.each do |selector, e|
-      e.keys.sort.each do |minute|
+      e.keys.sort.each do |bucket|
         aggregated[selector] = [] unless aggregated.has_key? selector
         aggregated[selector] << [
-          minute, e[minute].size          
+          bucket, e[bucket].size          
         ]
       end
     end
 
-#    aggregated['response_time_ms'] = []
-#    raw[:success].each do |ts, bucket|
-#      total = 0
-#      bucket.each do |entry|
-#        total += entry['response_time_microsecs'] unless entry['response_time_microsecs'] == nil
-#      end
-#      aggregated['response_time_ms'] << [
-#        ts, (total / bucket.size)
-#      ]
-#    end
+   raw[:success].keys.sort.each do |ts|
+     bucket = raw[:success][ts]
+     total = 0
+     count = 0
+     bucket.each do |entry|
+       if entry[:response_time_microsecs]
+         count += 1
+         total += entry[:response_time_microsecs].to_i / 1000
+       end
+     end
+     avg = total / count
+     if count < 5
+       puts "total for #{Time.at(ts)} : #{total}, count #{count} of #{bucket.size}. avg: #{avg}"
+     end
+     aggregated['response_time_ms'] ||= []
+     aggregated['response_time_ms'] << [
+       ts, avg
+     ]
+   end unless raw[:success] == nil
 
     aggregated
   end

@@ -6,8 +6,6 @@ class ApplicationController < ActionController::Base
   def evaluate_filter_params
     @date_format = "%d.%m.%Y %H:%M:%S %Z"
 
-    $logger.debug params
-
     @start_ts = nil
     @stop_ts = Time.now()
 

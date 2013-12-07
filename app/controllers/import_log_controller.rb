@@ -72,11 +72,11 @@ class ImportLogController < ApplicationController
       end
     elsif params[:lines]
       params[:lines].each do |line|
-	parsed = parser.parse(line)
+	      parsed = parser.parse(line)
         if parsed
           entries << parsed
         else
-          $logger.warn "could not parse : #{line}"
+          #$logger.warn "could not parse : #{line}"
         end
       end 
     end
