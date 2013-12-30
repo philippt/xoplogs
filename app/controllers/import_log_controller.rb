@@ -71,12 +71,16 @@ class ImportLogController < ApplicationController
         end
       end
     elsif params[:lines]
+      count = 0
       params[:lines].each do |line|
-	      parsed = parser.parse(line)
+        count += 1
+        parsed = parser.parse(line)
         if parsed
           entries << parsed
         else
-          #$logger.warn "could not parse : #{line}"
+          if count < 5
+            $logger.warn "could not parse with #{params[:parser]}: #{line}"
+          end
         end
       end 
     end
@@ -90,19 +94,89 @@ class ImportLogController < ApplicationController
     render :json => parse_data
   end
   
+  def point_or_null(line, ts)
+    point = line.select { |x| x[0] == ts }.first
+    if point
+      puts "found #{Time.at(point[0])}"
+      point
+    else
+      puts "nilling for #{Time.at(ts)}"
+      [ ts, 0 ]
+    end
+  end
+
   def parse_and_aggregate
     entries = parse_data
     
-    stats = PartitionedAggregator.aggregate(entries, params[:type])
-    
-    stats.each do |selector, e|
+    buckets = PartitionedAggregator.aggregate(entries, params[:type], params[:interval])
+
+    if params[:interval]
+      puts "interval : #{params[:interval]}"
+      now = Time.now
+      count = params[:count] ? params[:count].to_i : 1
+      case params[:interval].to_sym
+      when :minute
+        start = now.to_i
+	buckets.each do |selector, line|
+          new_data = []
+
+          0.upto(59 * count) do |offset|
+            ts = start - offset
+            new_data << point_or_null(line, ts)
+          end
+
+          buckets[selector] = new_data
+        end        
+        
+      when :hour
+        start = now.to_i - now.sec
+
+        buckets.each do |selector, line|
+          new_data = []
+	  0.upto(59 * count) do |offset|
+	    ts = start - offset * 60
+            new_data << point_or_null(line, ts)
+	  end
+          buckets[selector] = new_data
+        end
+ 
+      when :day
+        start = now.to_i - now.sec - now.min * 60
+
+        buckets.each do |selector, line|
+          new_data = []
+          0.upto(23 * count) do |offset|
+            ts = start - offset * 60 * 60
+            new_data << point_or_null(line, ts)
+          end
+          buckets[selector] = new_data
+        end
+      when :week
+        start = now.to_i - now.sec - now.min * 60 - now.hour * 60 * 60
+
+        buckets.each do |selector, line|
+          new_data = []
+          
+          0.upto(6 * count)  do |offset|
+            ts = start - offset * 60 * 60 * 24
+            new_data << point_or_null(line, ts)
+          end
+
+          buckets[selector] = new_data
+        end
+      else
+        # no interval?
+      end
+    end
+
+    buckets.each do |selector, e|
       e.each do |entry|
         entry[0] = entry[0] * 1000
       end
     end
     
     json = {
-      'stats' => stats,
+      'stats' => buckets,
       'parsed' => entries
     }
     render :json => json.to_json()
